@@ -1,0 +1,30 @@
+meta {
+  name: login
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:4000/api/admin/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email":"admin@prescripto.com",
+    "password":"qwerty122"
+  }
+}
+
+body:form-urlencoded {
+  name: DR. Richard james
+  email: test@demo.com
+  password: 12345678
+  degree: MBBS
+  experience: 4 years
+  about: Dr. Davis has a strong commitment to delivering comprehensive medical care, focusing on preventive medicine, early diagnosis, and effective treatment strategies. Dr. Davis has a strong commitment to delivering comprehensive medical care, focusing on preventive medicine, early diagnosis, and effective treatment strategies.
+  fees: 40
+  address: "{\n line1:'17th Cross, Richmond'.\nline2:'Circle, Ring Road, London'}"
+  speciality: General physician
+}

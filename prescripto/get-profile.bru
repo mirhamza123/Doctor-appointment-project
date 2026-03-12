@@ -1,0 +1,28 @@
+meta {
+  name: get-profile
+  type: http
+  seq: 6
+}
+
+get {
+  url: http://localhost:4000/api/user/get-profile
+  body: formUrlEncoded
+  auth: bearer
+}
+
+auth:bearer {
+  token: BearereyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4Y2U3ODI0OTNmYmRlYmI2NDE5NWJiMiIsImlhdCI6MTc1OTA0NTk3NH0._vj9CWLGfL3AHAIi2evD-xsjtKssz1C-1iyCl76_cVo
+}
+
+body:form-urlencoded {
+  : 
+}
+
+body:multipart-form {
+  : 
+  : 
+}
+
+settings {
+  encodeUrl: true
+}

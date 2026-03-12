@@ -1,0 +1,29 @@
+meta {
+  name: updata-profile
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://localhost:4000/api/user/update-profile?name=hamza&phone=03338974965&dob=2004-011-16&gender=male&address={
+  "line":"main street",
+  "line":"2nd road"
+}
+  body: none
+  auth: inherit
+}
+
+params:query {
+  name: hamza
+  phone: 03338974965
+  dob: 2004-011-16
+  gender: male
+  address: {
+    "line":"main street",
+    "line":"2nd road"
+  }
+}
+
+settings {
+  encodeUrl: true
+}

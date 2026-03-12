@@ -1,0 +1,46 @@
+meta {
+  name: login frontend
+  type: http
+  seq: 5
+}
+
+post {
+  url: http://localhost:4000/api/user/login
+  body: multipartForm
+  auth: bearer
+}
+
+headers {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4Y2U3ODI0OTNmYmRlYmI2NDE5NWJiMiIsImlhdCI6MTc1OTMxMTU2MH0.XrZyEzvTazxDZFZtd0hHP8yisk-6kgWkuPBJlmW7Cis
+}
+
+auth:bearer {
+  token: BearereyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4Y2U3ODI0OTNmYmRlYmI2NDE5NWJiMiIsImlhdCI6MTc1OTMxMTU2MH0.XrZyEzvTazxDZFZtd0hHP8yisk-6kgWkuPBJlmW7Cis
+}
+
+body:json {
+  {
+    "email":"user.greatstack@gmail.com",
+    "password":"12345678"
+  }
+}
+
+body:form-urlencoded {
+  "name ": hamza 
+  phone: 3338974965
+  dob: 2004-11-16
+  gender: male
+  address: {  "line1":"main street",  "
+}
+
+body:multipart-form {
+  name: hamza mir
+  phone: 3338974965
+  dob: 2004-11-16
+  gender: male
+  address: {  "line1":"main street",  "line2":"2nd road"}
+}
+
+settings {
+  encodeUrl: true
+}

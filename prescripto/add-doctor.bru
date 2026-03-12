@@ -1,0 +1,64 @@
+meta {
+  name: add-doctor
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:4000/api/admin/add-doctor?name=Dr. Emily Larson&email=EmilyLarson@demo.com&password=1234567&degree=MBBS&experience=3 years&about=Dr. Davis has a strong commitment to delivering comp&fees=30&address={
+            line1: '27th Cross, Richmond',
+            line2: 'Circle, Ring Road, London'
+        {
+            line1: '27th Cross, Richmond',
+            line2: 'Circle, Ring Road, London'
+        {
+            line1: '27th Cross, Richmond',
+            line2: 'Circle, Ring Road, London'
+        {
+            line1: '27th Cross, Richmond',
+            line2: 'Circle, Ring Road, London'
+        }&speciality=Gynecologist
+  body: multipartForm
+  auth: inherit
+}
+
+params:query {
+  name: Dr. Emily Larson
+  email: EmilyLarson@demo.com
+  password: 1234567
+  degree: MBBS
+  experience: 3 years
+  about: Dr. Davis has a strong commitment to delivering comp
+  fees: 30
+  address: {
+              line1: '27th Cross, Richmond',
+              line2: 'Circle, Ring Road, London'
+          {
+              line1: '27th Cross, Richmond',
+              line2: 'Circle, Ring Road, London'
+          {
+              line1: '27th Cross, Richmond',
+              line2: 'Circle, Ring Road, London'
+          {
+              line1: '27th Cross, Richmond',
+              line2: 'Circle, Ring Road, London'
+          }
+  speciality: Gynecologist
+  : 
+}
+
+headers {
+  : 
+}
+
+body:form-urlencoded {
+  : 
+}
+
+body:multipart-form {
+  name: 
+}
+
+settings {
+  encodeUrl: true
+}
