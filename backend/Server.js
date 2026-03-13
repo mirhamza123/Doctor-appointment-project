@@ -11,14 +11,29 @@ import router from "./routes/doctorRoute.js";
 import updaterouter from "./routes/userRoute.js";
 dotenv.config();
 
+// URLs
+const ADMIN_PANEL_URL = "https://doctor-appointment-project-ra7q.vercel.app";
+
 // Initialize Express app
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// CORS - handle preflight and set headers for all requests
+// CORS - allow admin panel and all origins
+const allowedOrigins = [
+  ADMIN_PANEL_URL,
+  "http://localhost:5173",
+  "http://localhost:5174",
+  /\.vercel\.app$/,
+];
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  const origin = req.headers.origin;
+  const allowOrigin = !origin || allowedOrigins.some((o) =>
+    typeof o === "string" ? o === origin : o.test(origin)
+  )
+    ? origin || "*"
+    : ADMIN_PANEL_URL;
+  res.setHeader("Access-Control-Allow-Origin", allowOrigin);
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, aToken");
   if (req.method === "OPTIONS") {
@@ -27,7 +42,7 @@ app.use((req, res, next) => {
   next();
 });
 app.use(cors({
-  origin: "*",
+  origin: allowedOrigins,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "aToken"],
 }));
