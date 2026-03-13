@@ -57,11 +57,25 @@ const addDoctor = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // uploading image to cloudinary
-    const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
-      resource_type: "image",
-    });
-    const imageUrl = imageUpload.secure_url; // Get the secure URL of the uploaded image
+    // Upload image to Cloudinary (support both disk path and buffer for Vercel serverless)
+    let imageUrl;
+    if (imageFile.buffer) {
+      // Serverless: use buffer
+      const uploadPromise = new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          { resource_type: "image" },
+          (err, result) => (err ? reject(err) : resolve(result))
+        );
+        uploadStream.end(imageFile.buffer);
+      });
+      const imageUpload = await uploadPromise;
+      imageUrl = imageUpload.secure_url;
+    } else {
+      const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
+        resource_type: "image",
+      });
+      imageUrl = imageUpload.secure_url;
+    }
 
     // ...existing code...
     const doctorData = {

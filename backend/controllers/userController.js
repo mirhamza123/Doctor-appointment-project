@@ -101,10 +101,23 @@ const updateProfile = async (req, res) => {
       gender,
     });
     if (imageFile) {
-      const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
-        resource_type: "image",
-      });
-      const imageURL = imageUpload.secure_url;
+      let imageURL;
+      if (imageFile.buffer) {
+        const uploadPromise = new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream(
+            { resource_type: "image" },
+            (err, result) => (err ? reject(err) : resolve(result))
+          );
+          uploadStream.end(imageFile.buffer);
+        });
+        const imageUpload = await uploadPromise;
+        imageURL = imageUpload.secure_url;
+      } else {
+        const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
+          resource_type: "image",
+        });
+        imageURL = imageUpload.secure_url;
+      }
       await userModel.findByIdAndUpdate(userId, { image: imageURL });
     }
 
