@@ -13,7 +13,8 @@ const AdminContextProvider = (props) => {
   const [appointments, setAppointments] = useState([]);
   const [dashData, setDashData] = useState(false);
 
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || "https://doctor-appointment-project-backend-sage.vercel.app";
+  // Production: use "" = same-origin, proxy forwards to backend (avoids CORS)
+  const backendUrl = import.meta.env.PROD ? "" : (import.meta.env.VITE_BACKEND_URL || "http://localhost:4000");
 
   const getalldoctor = async () => {
     try {
