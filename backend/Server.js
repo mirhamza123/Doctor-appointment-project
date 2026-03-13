@@ -15,26 +15,14 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 4000;
-//middleware
-app.use(express.json());
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      const allowed = [
-        "https://doctor-appointment-project-mu.vercel.app",
-        "http://localhost:5173",
-        "http://localhost:3000",
-      ];
-      if (!origin || allowed.includes(origin) || /\.vercel\.app$/.test(origin)) {
-        callback(null, true);
-      } else {
-        callback(null, true); // allow for now
-      }
-    },
-    credentials: true,
-  })
-);
 
+// CORS first - must run before other middleware
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "aToken"],
+}));
+app.use(express.json());
 adminRouter.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static("uploads"));
