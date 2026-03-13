@@ -47,19 +47,15 @@ import mongoose from "mongoose";
 
 const connectDB = async () => {
   try {
-    // Log the URL to verify it's being loaded correctly
-    console.log("Attempting to connect to MongoDB with URL:", process.env.MONGODB_URL);
-
     if (!process.env.MONGODB_URL) {
-      throw new Error("MongoDB connection URL is not defined in environment variables.");
+      console.warn("MONGODB_URL not set - DB features will not work");
+      return;
     }
-
     await mongoose.connect(process.env.MONGODB_URL);
-
-    console.log('Database connected successfully!');
+    console.log("Database connected successfully!");
   } catch (err) {
-    console.error('MongoDB connection failed:', err.message);
-    process.exit(1); // Exit process with failure
+    console.error("MongoDB connection failed:", err.message);
+    // Don't exit - let serverless function start (admin login works without DB)
   }
 };
 
