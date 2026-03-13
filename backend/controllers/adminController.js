@@ -106,18 +106,31 @@ const addDoctor = async (req, res) => {
 
 const loginAdmin = async (req, res) => {
   try {
-    console.log(req.body);
-    const { email, password } = req.body;
-    console.log("env:", process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD);
-    console.log("body:", email, password);
+    const { email, password } = req.body || {};
+    const trimEmail = (email || "").trim().toLowerCase();
+    const trimPassword = (password || "").trim();
 
-    if (
-      email === process.env.ADMIN_EMAIL &&
-      password === process.env.ADMIN_PASSWORD
-    ) {
+    if (!trimEmail || !trimPassword) {
+      return res.status(400).json({ success: false, message: "Email and password required" });
+    }
+
+    const adminEmail = (process.env.ADMIN_EMAIL || "").trim().toLowerCase();
+    const adminPassword = (process.env.ADMIN_PASSWORD || "").trim();
+
+    if (!adminEmail || !adminPassword) {
+      console.error("ADMIN_EMAIL or ADMIN_PASSWORD not set");
+      return res.status(500).json({ success: false, message: "Server config error" });
+    }
+
+    if (!process.env.JWT_SECRET) {
+      console.error("JWT_SECRET not set");
+      return res.status(500).json({ success: false, message: "Server config error" });
+    }
+
+    if (trimEmail === adminEmail && trimPassword === adminPassword) {
       // ✅ Sign with an object payload
       const token = jwt.sign(
-        { email }, // payload
+        { email: trimEmail },
         process.env.JWT_SECRET, // secret
         { expiresIn: "1h" } // options
       );
@@ -127,7 +140,7 @@ const loginAdmin = async (req, res) => {
       // ✅ success: true
       return res.json({ success: true, token });
     } else {
-      return res.json({ success: false, message: "Invalid credentials" });
+      return res.json({ success: false, message: "Invalid email or password" });
     }
   } catch (error) {
     console.log(error);
