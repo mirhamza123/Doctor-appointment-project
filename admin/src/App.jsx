@@ -6,7 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { AdminContext } from "./context/AdminContext";
 import Navbar from "./component/Navbar";
 import Sidebar from "./component/Sidebar";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 import Dashboard from "./pages/Admin/Dashboard";
 import AllApointment from "./pages/Admin/AllApointment";
 import AddDoctor from "./pages/Admin/AddDoctor";
@@ -28,8 +28,9 @@ function App() {
         <Sidebar />
         <main className="flex-1 min-w-0 w-full">
         <Routes>
+          <Route path="/" element={<Navigate to={aToken ? "/admin-dashboard" : "/doctor-dashboard"} replace />} />
+          <Route path="/admin" element={<Navigate to="/admin-dashboard" replace />} />
           {/* admin routes */}
-          <Route path="/" element={<></>} />
           <Route path="/admin-dashboard" element={<Dashboard />} />
           <Route path="/alll-apointments" element={<AllApointment />} />
           <Route path="/add-doctor" element={<AddDoctor />} />

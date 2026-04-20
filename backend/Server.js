@@ -35,7 +35,7 @@ app.use((req, res, next) => {
     : ADMIN_PANEL_URL;
   res.setHeader("Access-Control-Allow-Origin", allowOrigin);
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, aToken");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, aToken, dtoken, dToken");
   if (req.method === "OPTIONS") {
     return res.sendStatus(200);
   }
@@ -44,7 +44,7 @@ app.use((req, res, next) => {
 app.use(cors({
   origin: allowedOrigins,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "aToken"],
+  allowedHeaders: ["Content-Type", "Authorization", "aToken", "dtoken", "dToken"],
 }));
 app.use(express.json());
 adminRouter.use(express.json());

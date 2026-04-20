@@ -6,8 +6,13 @@ import { AppContext } from "../../context/AppContext";
 import { assets } from "../../assets/assets";
 
 const AllApointment = () => {
-  const { aToken, appointments, getAllAppointments, cancelAppointment } =
-    useContext(AdminContext);
+  const {
+    aToken,
+    appointments,
+    getAllAppointments,
+    cancelAppointment,
+    deleteAppointment,
+  } = useContext(AdminContext);
   const { calculateAge, slotDateFormate, currency } = useContext(AppContext);
 
   useEffect(() => {
@@ -18,75 +23,150 @@ const AllApointment = () => {
 
   return (
     <div className="w-full m-5">
-      <p className="mb-3 text-lg font-medium">All Appointments</p>
-
-      <div className=" bg-white border rounded text-sm max-h-[80vh] min-h-[60vh] overflow-y-scroll">
-        <div className="hidden sm:grid grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] grid-flow-col py-3 px-6 border-b">
-          <p>#</p>
-          <p>Patient</p>
-          <p>Age</p>
-          <p>Date & Time</p>
-          <p>Doctor</p>
-          <p>Fees</p>
-          <p>Action</p>
+      <div className="mb-6 flex flex-col gap-4 rounded-3xl border border-slate-200 bg-slate-50 p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-2xl font-semibold text-slate-900">
+            ALL Appointments
+          </p>
+          <p className="mt-1 max-w-2xl text-sm text-slate-500">
+            View recent bookings, appointment status, and doctor details in a
+            clean executive table.
+          </p>
         </div>
+        <span className="inline-flex items-center rounded-full bg-indigo-100 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18rem] text-indigo-700">
+          newest first
+        </span>
+      </div>
 
-        {/* {appointments.map((item, index) => {
-          <div key={index}>
-            <p>{index + 1}</p>
-            <div>
-              <img src={item.docData?.Image} />
-              <p>{item.userData.name}</p>
-            </div>
-          </div>;
-        })} */}
-
-        {appointments.map((item, index) => {
-          return (
-            <div
-              className="flex flex_wrap justify-between max-sm:gap-2 sm:grid sm:grid-cols-[0.5fr_3fr_1fr_3fr_3fr_1fr_1fr] items-center text-gray-500 py-3 px-6 border-b hover:bg-gray-50 "
-              key={index}
-            >
-              <p className="max-sm:hidden">{index + 1}</p>
-              <div className="flex items-center gap-2">
-                <img
-                  className="w-8 rounded-full"
-                  src={item.userData.image}
-                  alt="Doctor"
-                />
-                <p>{item.userData.name}</p>
-              </div>
-              <p className="max-sm:hidden">{calculateAge(item.userData.dob)}</p>
-              <p>
-                {slotDateFormate(item.slotDate)} , {item.slotTime}
-              </p>
-              <div className="flex items-center gap-2">
-                <img
-                  className="w-8 rounded-full bg-gray-200"
-                  src={item.docData.Image}
-                  alt="Doctor"
-                />
-                <p>{item.docData.name}</p>
-              </div>
-              <p>
-                {currency}
-                {item.amount}
-              </p>
-              {item.cancelled ? (
-                <p className="text-red-400 text-xs font-medium">Cancelled</p>
-              ) : item.isCompleted ? (
-                <p className="text-green-500 text-xs font-medium">Completed</p>
-              ) : (
-                <img
-                  onClick={() => cancelAppointment(item._id)}
-                  className="w-10 cursor-pointer"
-                  src={assets.cancel_icon}
-                  alt=""
-                />
-              )}
-            </div>
-          );
-        })}
+      <div className="overflow-hidden rounded-[30px] border border-slate-200 bg-white shadow-[0_12px_40px_-20px_rgba(15,23,42,0.2)]">
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm">
+            <thead className="bg-slate-200 text-black">
+              <tr>
+                <th className="whitespace-nowrap px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.15em] text-black">
+                  #
+                </th>
+                <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.15em] text-black">
+                  Patient
+                </th>
+                <th className="whitespace-nowrap px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.15em] text-black">
+                  Age
+                </th>
+                <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.15em] text-black">
+                  Date & Time
+                </th>
+                <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.15em] text-black">
+                  Doctor
+                </th>
+                <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.15em] text-black">
+                  Fees
+                </th>
+                <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.15em] text-black">
+                  Status
+                </th>
+                <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.15em] text-black">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200 bg-white">
+              {appointments.map((item, index) => (
+                <tr
+                  key={item._id || index}
+                  className="transition hover:bg-slate-50"
+                >
+                  <td className="whitespace-nowrap px-5 py-4 text-slate-600">
+                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-100 text-sm font-semibold text-slate-700">
+                      {index + 1}
+                    </span>
+                  </td>
+                  <td className="px-5 py-4">
+                    <div className="flex items-center gap-3">
+                      <img
+                        className="h-11 w-11 rounded-full object-cover"
+                        src={item.userData.image}
+                        alt={item.userData.name}
+                      />
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900">
+                          {item.userData.name}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {item.userData.email}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="whitespace-nowrap px-5 py-4 text-slate-600">
+                    {calculateAge(item.userData.dob)}
+                  </td>
+                  <td className="px-5 py-4 text-slate-600">
+                    <p className="font-medium text-slate-900">
+                      {slotDateFormate(item.slotDate)}
+                    </p>
+                    <p className="text-xs text-slate-500">{item.slotTime}</p>
+                  </td>
+                  <td className="px-5 py-4">
+                    <div className="flex items-center gap-3">
+                      <img
+                        className="h-11 w-11 rounded-full bg-slate-100 object-cover"
+                        src={item.docData.Image}
+                        alt={item.docData.name}
+                      />
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900">
+                          {item.docData.name}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {item.docData.speciality}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="whitespace-nowrap px-5 py-4 text-slate-600">
+                    <span className="text-sm font-semibold text-slate-900">
+                      {currency}
+                      {item.amount}
+                    </span>
+                  </td>
+                  <td className="px-5 py-4">
+                    {item.cancelled ? (
+                      <span className="inline-flex rounded-full bg-red-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-red-600">
+                        Cancelled
+                      </span>
+                    ) : item.isCompleted ? (
+                      <span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
+                        Completed
+                      </span>
+                    ) : (
+                      <span className="inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
+                        Pending
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-5 py-4">
+                    <div className="flex flex-wrap gap-2">
+                      {!item.cancelled && !item.isCompleted && (
+                        <button
+                          onClick={() => cancelAppointment(item._id)}
+                          className="inline-flex items-center rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white transition hover:bg-slate-800"
+                        >
+                          Cancel
+                        </button>
+                      )}
+                      <button
+                        onClick={() => deleteAppointment(item._id)}
+                        className="inline-flex items-center rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700 transition hover:bg-red-100"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

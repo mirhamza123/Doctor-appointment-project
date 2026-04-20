@@ -64,7 +64,7 @@ const addDoctor = async (req, res) => {
       const uploadPromise = new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           { resource_type: "image" },
-          (err, result) => (err ? reject(err) : resolve(result))
+          (err, result) => (err ? reject(err) : resolve(result)),
         );
         uploadStream.end(imageFile.buffer);
       });
@@ -111,7 +111,9 @@ const loginAdmin = async (req, res) => {
     const trimPassword = (password || "").trim();
 
     if (!trimEmail || !trimPassword) {
-      return res.status(400).json({ success: false, message: "Email and password required" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Email and password required" });
     }
 
     const adminEmail = (process.env.ADMIN_EMAIL || "").trim().toLowerCase();
@@ -119,12 +121,16 @@ const loginAdmin = async (req, res) => {
 
     if (!adminEmail || !adminPassword) {
       console.error("ADMIN_EMAIL or ADMIN_PASSWORD not set");
-      return res.status(500).json({ success: false, message: "Server config error" });
+      return res
+        .status(500)
+        .json({ success: false, message: "Server config error" });
     }
 
     if (!process.env.JWT_SECRET) {
       console.error("JWT_SECRET not set");
-      return res.status(500).json({ success: false, message: "Server config error" });
+      return res
+        .status(500)
+        .json({ success: false, message: "Server config error" });
     }
 
     if (trimEmail === adminEmail && trimPassword === adminPassword) {
@@ -132,7 +138,7 @@ const loginAdmin = async (req, res) => {
       const token = jwt.sign(
         { email: trimEmail },
         process.env.JWT_SECRET, // secret
-        { expiresIn: "1h" } // options
+        { expiresIn: "1h" }, // options
       );
 
       console.log("token:", token);
@@ -163,7 +169,7 @@ const allDoctors = async (req, res) => {
 
 const appointmentsAdmin = async (req, res) => {
   try {
-    const appointments = await appointmentModel.find({});
+    const appointments = await appointmentModel.find({}).sort({ date: -1 });
     res.json({ success: true, appointments });
   } catch (error) {
     console.log(error);
@@ -175,16 +181,18 @@ const appointmentsAdmin = async (req, res) => {
 
 const appointmentCancel = async (req, res) => {
   try {
-    // const {userId, appointmentId}=req.body;
-    // const userId = req.userId;
     const { appointmentId } = req.body;
 
     const appointmentData = await appointmentModel.findById(appointmentId);
+    if (!appointmentData) {
+      return res.json({ success: false, message: "Appointment not found" });
+    }
 
     await appointmentModel.findByIdAndUpdate(appointmentId, {
       cancelled: true,
     });
-    ///releasing  doctor slot
+
+    // release doctor slot
     const { docId, slotDate, slotTime } = appointmentData;
     const doctorData = await doctorModel.findById(docId);
     let slot_booked = doctorData.slot_booked;
@@ -193,6 +201,39 @@ const appointmentCancel = async (req, res) => {
     await doctorModel.findByIdAndUpdate(docId, { slot_booked });
 
     res.json({ success: true, message: "Appointment cancelled successfully" });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+const deleteAppointment = async (req, res) => {
+  try {
+    const { appointmentId } = req.body;
+    if (!appointmentId) {
+      return res.json({
+        success: false,
+        message: "Appointment ID is required",
+      });
+    }
+
+    const appointmentData = await appointmentModel.findById(appointmentId);
+    if (!appointmentData) {
+      return res.json({ success: false, message: "Appointment not found" });
+    }
+
+    if (!appointmentData.cancelled) {
+      const { docId, slotDate, slotTime } = appointmentData;
+      const doctorData = await doctorModel.findById(docId);
+      let slot_booked = doctorData.slot_booked;
+      slot_booked[slotDate] = slot_booked[slotDate].filter(
+        (e) => e !== slotTime,
+      );
+      await doctorModel.findByIdAndUpdate(docId, { slot_booked });
+    }
+
+    await appointmentModel.findByIdAndDelete(appointmentId);
+    res.json({ success: true, message: "Appointment deleted successfully" });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
@@ -246,6 +287,7 @@ export {
   allDoctors,
   appointmentsAdmin,
   appointmentCancel,
+  deleteAppointment,
   adminDashboard,
   deleteDoctor,
 };

@@ -7,21 +7,23 @@ export const AdminContext = createContext();
 
 const AdminContextProvider = (props) => {
   const [aToken, setAToken] = useState(
-    localStorage.getItem("aToken") ? localStorage.getItem("aToken") : ""
+    localStorage.getItem("aToken") ? localStorage.getItem("aToken") : "",
   );
   const [doctors, setDoctors] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [dashData, setDashData] = useState(false);
 
   // Production: use "" = same-origin, proxy forwards to backend (avoids CORS)
-  const backendUrl = import.meta.env.PROD ? "" : (import.meta.env.VITE_BACKEND_URL || "http://localhost:4000");
+  const backendUrl = import.meta.env.PROD
+    ? ""
+    : import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
 
   const getalldoctor = async () => {
     try {
       const { data } = await axios.post(
         `${backendUrl}/api/admin/all-doctors`,
         {},
-        { headers: { aToken } }
+        { headers: { aToken } },
       );
       if (data.success) {
         setDoctors(data.doctors);
@@ -39,7 +41,7 @@ const AdminContextProvider = (props) => {
       const { data } = await axios.post(
         `${backendUrl}/api/admin/change-availability`,
         { docId },
-        { headers: { aToken } }
+        { headers: { aToken } },
       );
       if (data.success) {
         getalldoctor();
@@ -57,7 +59,7 @@ const AdminContextProvider = (props) => {
       const { data } = await axios.post(
         `${backendUrl}/api/admin/delete-doctor`,
         { docId },
-        { headers: { aToken } }
+        { headers: { aToken } },
       );
       if (data.success) {
         setDoctors((prev) => prev.filter((d) => d._id !== docId));
@@ -91,7 +93,25 @@ const AdminContextProvider = (props) => {
       const { data } = await axios.post(
         `${backendUrl}/api/admin/cancel-appointment`,
         { appointmentId },
-        { headers: { aToken } }
+        { headers: { aToken } },
+      );
+      if (data.success) {
+        toast.success(data.message);
+        getAllAppointments();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const deleteAppointment = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(
+        `${backendUrl}/api/admin/delete-appointment`,
+        { appointmentId },
+        { headers: { aToken } },
       );
       if (data.success) {
         toast.success(data.message);
@@ -132,6 +152,7 @@ const AdminContextProvider = (props) => {
     setAppointments,
     getAllAppointments,
     cancelAppointment,
+    deleteAppointment,
     dashData,
     getDashData,
   };
