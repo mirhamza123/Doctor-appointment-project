@@ -110,46 +110,69 @@ const loginAdmin = async (req, res) => {
     const trimEmail = (email || "").trim().toLowerCase();
     const trimPassword = (password || "").trim();
 
+    // Validate input
     if (!trimEmail || !trimPassword) {
       return res
         .status(400)
         .json({ success: false, message: "Email and password required" });
     }
 
+    // Check if JWT_SECRET is set
+    if (!process.env.JWT_SECRET) {
+      console.error("JWT_SECRET not set in environment variables");
+      return res
+        .status(500)
+        .json({ success: false, message: "Server configuration error" });
+    }
+
+    // ✅ METHOD 1: Check against environment variables (plain text)
     const adminEmail = (process.env.ADMIN_EMAIL || "").trim().toLowerCase();
     const adminPassword = (process.env.ADMIN_PASSWORD || "").trim();
 
-    if (!adminEmail || !adminPassword) {
-      console.error("ADMIN_EMAIL or ADMIN_PASSWORD not set");
-      return res
-        .status(500)
-        .json({ success: false, message: "Server config error" });
-    }
-
-    if (!process.env.JWT_SECRET) {
-      console.error("JWT_SECRET not set");
-      return res
-        .status(500)
-        .json({ success: false, message: "Server config error" });
-    }
-
-    if (trimEmail === adminEmail && trimPassword === adminPassword) {
-      // ✅ Sign with an object payload
+    if (
+      adminEmail &&
+      adminPassword &&
+      trimEmail === adminEmail &&
+      trimPassword === adminPassword
+    ) {
       const token = jwt.sign(
-        { email: trimEmail },
-        process.env.JWT_SECRET, // secret
-        { expiresIn: "1h" }, // options
+        { email: trimEmail, role: "admin" },
+        process.env.JWT_SECRET,
+        { expiresIn: "7d" },
       );
 
-      console.log("token:", token);
+      console.log("Admin login successful via env variables");
+      return res.json({ success: true, token, message: "Login successful" });
+    }
 
-      // ✅ success: true
-      return res.json({ success: true, token });
-    } else {
+    // ✅ METHOD 2: Check against MongoDB (hashed password)
+    const adminUser = await userModel.findOne({ email: trimEmail });
+
+    if (!adminUser) {
       return res.json({ success: false, message: "Invalid email or password" });
     }
+
+    // Verify hashed password using bcrypt
+    const isPasswordValid = await bcrypt.compare(
+      trimPassword,
+      adminUser.password,
+    );
+
+    if (!isPasswordValid) {
+      return res.json({ success: false, message: "Invalid email or password" });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: adminUser._id, email: trimEmail, role: "admin" },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" },
+    );
+
+    console.log("Admin login successful via MongoDB");
+    return res.json({ success: true, token, message: "Login successful" });
   } catch (error) {
-    console.log(error);
+    console.error("Login error:", error);
     res.json({ success: false, message: error.message });
   }
 };
