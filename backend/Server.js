@@ -28,26 +28,41 @@ const allowedOrigins = [
 ];
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  const allowOrigin = !origin || allowedOrigins.some((o) =>
-    typeof o === "string" ? o === origin : o.test(origin)
-  )
-    ? origin || "*"
-    : ADMIN_PANEL_URL;
+  const allowOrigin =
+    !origin ||
+    allowedOrigins.some((o) =>
+      typeof o === "string" ? o === origin : o.test(origin),
+    )
+      ? origin || "*"
+      : ADMIN_PANEL_URL;
   res.setHeader("Access-Control-Allow-Origin", allowOrigin);
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, aToken, dtoken, dToken");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, aToken, dtoken, dToken",
+  );
   if (req.method === "OPTIONS") {
     return res.sendStatus(200);
   }
   next();
 });
-app.use(cors({
-  origin: allowedOrigins,
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "aToken", "dtoken", "dToken"],
-}));
+app.use(
+  cors({
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "aToken",
+      "dtoken",
+      "dToken",
+    ],
+  }),
+);
 app.use(express.json());
-adminRouter.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static("uploads"));
 
