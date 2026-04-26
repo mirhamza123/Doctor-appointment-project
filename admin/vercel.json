@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://doctor-appointment-project-backend-dn972bszl.vercel.app/api/:path*"
+      "destination": "https://doctor-appointment-project-backend-sage.vercel.app/api/:path*"
     },
     {
       "source": "/(.*)",
