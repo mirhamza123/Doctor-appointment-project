@@ -1,18 +1,16 @@
 // import mongoose from "mongoose";
 
-
 // const connectDB = async()=>{
-    
+
 //     mongoose.Connection('connected', ()=>console.log("database coonected"))
 //     await mongoose.connect(`${process.env.MONGODB_URI}/prescripto`)
-    
+
 // }
 // export default connectDB;
 
 // import mongoose from "mongoose";
 // import dotenv from 'dotenv';
 // dotenv.config({ path: './config.env' });
-
 
 // import mongoose from "mongoose";
 // import mongoose from "mongoose";
@@ -23,7 +21,7 @@
 //   try {
 //     console.log(process.env.MONGODB_URL);
 //     await mongoose.connect(process.env.MONGODB_URL);
-    
+
 //     console.log('Database connected');
 //   } catch (err) {
 //     console.error('MongoDB connection failed: hamza ', err.message);
@@ -33,14 +31,12 @@
 
 // export default connectDB;
 
-
 // const connectDB = async () => {
 //   mongoose.connect('connected', ()=> console.log('database connected'))
 //    await mongoose.connect(`${process.env. MONGOSE_URL}`)
 // };
 
 // export default connectDB;
-
 
 // ///////////////////////////////////////////////////////////////////////////////////
 import mongoose from "mongoose";
