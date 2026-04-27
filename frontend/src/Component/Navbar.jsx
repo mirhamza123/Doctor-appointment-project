@@ -10,6 +10,10 @@ function Navbar() {
   const { token, setToken, userData } = useContext(AppContext);
   const [ShowMenu, setShowMenu] = useState(false);
 
+  const handleScrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const logout = () => {
     setToken(false);
     localStorage.removeItem("token");
@@ -18,25 +22,28 @@ function Navbar() {
   return (
     <div className="flex items-center justify-between text-sm py-4 mb-5 border-b border-b-gray-400">
       <img
-        onClick={() => Navigate("/")}
+        onClick={() => {
+          Navigate("/");
+          handleScrollToTop();
+        }}
         className="w-44 cursor-pointer"
         src={assets.logo}
         alt=""
       />
       <ul className=" hidden md:flex  items-start gap-5 font-medium">
-        <NavLink to="/">
+        <NavLink to="/" onClick={handleScrollToTop}>
           <li className="py-1">Home</li>
           <hr className="border-none outline-none  h-0.5 bg-primary w-3/5 m-auto hidden" />
         </NavLink>
-        <NavLink to="/Doctors">
+        <NavLink to="/Doctors" onClick={handleScrollToTop}>
           <li className="py-1">All Doctors</li>
           <hr className="border-none outline-none  h-0.5 bg-primary w-3/5 m-auto hidden" />
         </NavLink>
-        <NavLink to="/about">
+        <NavLink to="/about" onClick={handleScrollToTop}>
           <li className="py-1">About</li>
           <hr className="border-none outline-none  h-0.5 bg-primary w-3/5 m-auto hidden" />
         </NavLink>
-        <NavLink to="/contact">
+        <NavLink to="/contact" onClick={handleScrollToTop}>
           <li className="py-1">Contact</li>
           <hr className="border-none outline-none  h-0.5 bg-primary w-3/5 m-auto hidden" />
         </NavLink>
