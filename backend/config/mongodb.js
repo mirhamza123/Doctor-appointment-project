@@ -47,10 +47,18 @@ const connectDB = async () => {
       console.warn("MONGODB_URL not set - DB features will not work");
       return;
     }
-    await mongoose.connect(process.env.MONGODB_URL);
+    console.log("Attempting to connect to MongoDB...");
+    await mongoose.connect(process.env.MONGODB_URL, {
+      connectTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 5000,
+    });
     console.log("Database connected successfully!");
   } catch (err) {
     console.error("MongoDB connection failed:", err.message);
+    console.log(
+      "Server will continue without database - ensure MongoDB is running and accessible",
+    );
     // Don't exit - let serverless function start (admin login works without DB)
   }
 };
