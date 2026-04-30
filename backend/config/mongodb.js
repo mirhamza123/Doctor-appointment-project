@@ -44,22 +44,25 @@ import mongoose from "mongoose";
 const connectDB = async () => {
   try {
     if (!process.env.MONGODB_URL) {
-      console.warn("MONGODB_URL not set - DB features will not work");
-      return;
+      throw new Error("MONGODB_URL not set in environment variables");
     }
-    console.log("Attempting to connect to MongoDB...");
+    console.log("🔄 Connecting to MongoDB...");
+
     await mongoose.connect(process.env.MONGODB_URL, {
-      connectTimeoutMS: 5000,
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 5000,
+      connectTimeoutMS: 30000,
+      serverSelectionTimeoutMS: 30000,
+      socketTimeoutMS: 60000,
+      maxPoolSize: 10,
+      minPoolSize: 2,
+      retryWrites: true,
+      retryReads: true,
     });
-    console.log("Database connected successfully!");
+
+    console.log("✅ MongoDB connected successfully!");
+    return true;
   } catch (err) {
-    console.error("MongoDB connection failed:", err.message);
-    console.log(
-      "Server will continue without database - ensure MongoDB is running and accessible",
-    );
-    // Don't exit - let serverless function start (admin login works without DB)
+    console.error("❌ MongoDB connection failed:", err.message);
+    throw err;
   }
 };
 

@@ -66,10 +66,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static("uploads"));
 
-// Connect to MongoDB and Cloudinary
-connectDB();
-connectCloudinary();
-
 // API endpoints
 app.use("/api/admin", adminRouter);
 app.use("/api/doctor", router);
@@ -80,11 +76,40 @@ app.get("/", (req, res) => {
   res.send("Hello World! Server is running.");
 });
 
-// Start server only when not on Vercel (serverless)
-if (!process.env.VERCEL) {
-  app.listen(PORT, () => {
-    console.log(`Server started on http://localhost:${PORT}`);
-  });
-}
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", message: "Server is running" });
+});
+
+// Initialize server with proper async handling
+const startServer = async () => {
+  try {
+    console.log("📦 Starting server initialization...");
+
+    // Connect to MongoDB FIRST
+    await connectDB();
+
+    // Then connect Cloudinary
+    connectCloudinary();
+
+    // Start server only when not on Vercel (serverless)
+    if (!process.env.VERCEL) {
+      app.listen(PORT, () => {
+        console.log(`🚀 Server running on http://localhost:${PORT}`);
+        console.log("✅ All systems ready!");
+      });
+    } else {
+      console.log("✅ App ready for Vercel serverless");
+    }
+  } catch (error) {
+    console.error("💥 Server initialization failed:", error.message);
+    if (!process.env.VERCEL) {
+      process.exit(1);
+    }
+  }
+};
+
+// Start the server
+startServer();
 
 export default app;
