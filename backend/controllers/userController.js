@@ -106,7 +106,7 @@ const updateProfile = async (req, res) => {
         const uploadPromise = new Promise((resolve, reject) => {
           const uploadStream = cloudinary.uploader.upload_stream(
             { resource_type: "image" },
-            (err, result) => (err ? reject(err) : resolve(result))
+            (err, result) => (err ? reject(err) : resolve(result)),
           );
           uploadStream.end(imageFile.buffer);
         });
@@ -274,10 +274,18 @@ const cancelAppointment = async (req, res) => {
     ///releasing  doctor slot
     const { docId, slotDate, slotTime } = appointmentData;
     const doctorData = await doctorModel.findById(docId);
-    let slot_booked = doctorData.slot_booked;
 
-    slot_booked[slotDate] = slot_booked[slotDate].filter((e) => e !== slotTime);
-    await doctorModel.findByIdAndUpdate(docId, { slot_booked });
+    if (
+      doctorData &&
+      doctorData.slot_booked &&
+      doctorData.slot_booked[slotDate]
+    ) {
+      let slot_booked = doctorData.slot_booked;
+      slot_booked[slotDate] = slot_booked[slotDate].filter(
+        (e) => e !== slotTime,
+      );
+      await doctorModel.findByIdAndUpdate(docId, { slot_booked });
+    }
 
     res.json({ success: true, message: "Appointment cancelled successfully" });
   } catch (error) {

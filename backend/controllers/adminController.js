@@ -218,10 +218,18 @@ const appointmentCancel = async (req, res) => {
     // release doctor slot
     const { docId, slotDate, slotTime } = appointmentData;
     const doctorData = await doctorModel.findById(docId);
-    let slot_booked = doctorData.slot_booked;
 
-    slot_booked[slotDate] = slot_booked[slotDate].filter((e) => e !== slotTime);
-    await doctorModel.findByIdAndUpdate(docId, { slot_booked });
+    if (
+      doctorData &&
+      doctorData.slot_booked &&
+      doctorData.slot_booked[slotDate]
+    ) {
+      let slot_booked = doctorData.slot_booked;
+      slot_booked[slotDate] = slot_booked[slotDate].filter(
+        (e) => e !== slotTime,
+      );
+      await doctorModel.findByIdAndUpdate(docId, { slot_booked });
+    }
 
     res.json({ success: true, message: "Appointment cancelled successfully" });
   } catch (error) {
@@ -245,16 +253,7 @@ const deleteAppointment = async (req, res) => {
       return res.json({ success: false, message: "Appointment not found" });
     }
 
-    if (!appointmentData.cancelled) {
-      const { docId, slotDate, slotTime } = appointmentData;
-      const doctorData = await doctorModel.findById(docId);
-      let slot_booked = doctorData.slot_booked;
-      slot_booked[slotDate] = slot_booked[slotDate].filter(
-        (e) => e !== slotTime,
-      );
-      await doctorModel.findByIdAndUpdate(docId, { slot_booked });
-    }
-
+    // Just delete the appointment, don't release doctor slot
     await appointmentModel.findByIdAndDelete(appointmentId);
     res.json({ success: true, message: "Appointment deleted successfully" });
   } catch (error) {
