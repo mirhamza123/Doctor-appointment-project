@@ -24,6 +24,8 @@ const allowedOrigins = [
   ADMIN_PANEL_URL,
   "http://localhost:5173",
   "http://localhost:5174",
+  "http://localhost:5175",
+  "http://localhost:5176",
   /\.vercel\.app$/,
 ];
 app.use((req, res, next) => {

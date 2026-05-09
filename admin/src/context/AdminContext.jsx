@@ -16,7 +16,7 @@ const AdminContextProvider = (props) => {
   // Production: use "" = same-origin, proxy forwards to backend (avoids CORS)
   const backendUrl = import.meta.env.PROD
     ? ""
-    : import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+    : ""; // Use proxy for development
 
   const getalldoctor = async () => {
     try {
