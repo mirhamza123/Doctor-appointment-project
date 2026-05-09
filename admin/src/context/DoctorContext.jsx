@@ -7,7 +7,7 @@ export const DoctorContext = createContext();
 
 const DoctorContextProvider = (props) => {
   // Production: use "" = same-origin, proxy forwards to backend (avoids CORS)
-  const backendUrl = import.meta.env.PROD ? "" : (import.meta.env.VITE_BACKEND_URL || "http://localhost:4000");
+  const backendUrl = import.meta.env.PROD ? "" : ""; // Use proxy for development
   const [dtoken, setDtoken] = useState(
     localStorage.getItem("dToken") ? localStorage.getItem("dToken") : ""
   );
