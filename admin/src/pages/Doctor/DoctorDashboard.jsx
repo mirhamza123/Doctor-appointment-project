@@ -78,68 +78,150 @@ const DoctorDashboard = () => {
         </div>
 
         <div className="overflow-x-auto">
-          <div className="max-sm:hidden grid grid-cols-[0.5fr_2fr_1fr_1fr_3fr_1fr_1fr] gap-1 py-3 px-6 border-b bg-gray-50 font-medium text-sm">
-            <p>#</p>
-            <p>Patient</p>
-            <p>Payment</p>
-            <p>Age</p>
-            <p>Date & Time</p>
-            <p>Fees</p>
-            <p>Action</p>
-          </div>
-
-          <div className="max-h-[55vh] overflow-y-auto">
-            {sortedAppointments.length === 0 ? (
-              <p className="py-10 px-6 text-gray-500 text-center text-sm">No appointments yet.</p>
-            ) : (
-              sortedAppointments.map((item, index) => (
-                <div
-                  key={item._id}
-                  className="flex flex-wrap justify-between max-sm:gap-3 max-sm:text-base sm:grid grid-cols-[0.5fr_2fr_1fr_1fr_3fr_1fr_1fr] gap-1 py-3 px-6 border-b items-center hover:bg-gray-50 text-sm"
-                >
-                  <p className="max-sm:hidden">{index + 1}</p>
-                  <div className="flex items-center gap-2">
-                    <img
-                      src={item.userData?.image || item.userData?.Image}
-                      alt=""
-                      className="w-8 rounded-full"
-                    />
-                    <p>{item.userData?.name}</p>
-                  </div>
-                  <p className="text-xs inline border border-[#5f6fff] px-2 rounded-full w-fit">
-                    {item.payment ? "Online" : "Cash"}
-                  </p>
-                  <p className="max-sm:hidden">{calculateAge(item.userData?.dob)}</p>
-                  <p>
-                    {slotDateFormate(item.slotDate)}, {item.slotTime}
-                  </p>
-                  <p>
-                    {currency}{item.amount}
-                  </p>
-                  {item.cancelled ? (
-                    <p className="text-red-400 text-xs font-medium">Cancelled</p>
-                  ) : item.isCompleted ? (
-                    <p className="text-green-500 text-xs font-medium">Completed</p>
-                  ) : (
-                    <div className="flex">
-                      <img
-                        onClick={() => cancelAppointment(item._id)}
-                        className="w-10 cursor-pointer"
-                        src={assets.cancel_icon}
-                        alt="Cancel"
-                      />
-                      <img
-                        onClick={() => completeAppointment(item._id)}
-                        className="w-10 cursor-pointer"
-                        src={assets.tick_icon}
-                        alt="Complete"
-                      />
-                    </div>
-                  )}
-                </div>
-              ))
-            )}
-          </div>
+          <table className="min-w-full text-sm">
+            <thead className="bg-slate-200 text-slate-600">
+              <tr>
+                <th className="px-6 py-4 text-left font-semibold uppercase tracking-[0.12rem]">
+                  #
+                </th>
+                <th className="px-6 py-4 text-left font-semibold uppercase tracking-[0.12rem]">
+                  Patient
+                </th>
+                <th className="px-6 py-4 text-left font-semibold uppercase tracking-[0.12rem]">
+                  Age
+                </th>
+                <th className="px-6 py-4 text-left font-semibold uppercase tracking-[0.12rem]">
+                  Date & Time
+                </th>
+                <th className="px-6 py-4 text-left font-semibold uppercase tracking-[0.12rem]">
+                  Doctor
+                </th>
+                <th className="px-6 py-4 text-left font-semibold uppercase tracking-[0.12rem]">
+                  Fees
+                </th>
+                <th className="px-6 py-4 text-left font-semibold uppercase tracking-[0.12rem]">
+                  Status
+                </th>
+                <th className="px-6 py-4 text-left font-semibold uppercase tracking-[0.12rem]">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200 bg-white">
+              {sortedAppointments.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan="8"
+                    className="py-10 px-6 text-gray-500 text-center text-sm"
+                  >
+                    No appointments yet.
+                  </td>
+                </tr>
+              ) : (
+                sortedAppointments.slice(0, 5).map((item, index) => (
+                  <tr
+                    key={item._id || index}
+                    className="transition hover:bg-slate-50"
+                  >
+                    <td className="px-6 py-4 text-slate-500">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-sm font-semibold">
+                        {index + 1}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <img
+                          className="h-11 w-11 rounded-full object-cover"
+                          src={item.userData?.image || item.userData?.Image}
+                          alt={item.userData?.name || "Patient"}
+                        />
+                        <div>
+                          <p className="font-semibold text-slate-900">
+                            {item.userData?.name || "Patient"}
+                          </p>
+                          <p className="text-xs text-slate-500">
+                            {item.userData?.email || "No email"}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-slate-600">
+                      {item.userData?.dob
+                        ? calculateAge(item.userData.dob)
+                        : "-"}
+                    </td>
+                    <td className="px-6 py-4 text-slate-600">
+                      <p className="font-medium text-slate-900">
+                        {slotDateFormate(item.slotDate)}
+                      </p>
+                      <p className="text-xs text-slate-500">{item.slotTime}</p>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <img
+                          className="h-11 w-11 rounded-full object-cover"
+                          src={item.docData?.Image || ""}
+                          alt={item.docData?.name || "Doctor"}
+                        />
+                        <div>
+                          <p className="font-semibold text-slate-900">
+                            {item.docData?.name || "Doctor"}
+                          </p>
+                          <p className="text-xs text-slate-500">
+                            {item.docData?.speciality || "Speciality"}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-slate-900 font-semibold">
+                      {currency}
+                      {item.amount}
+                    </td>
+                    <td className="px-6 py-4">
+                      {item.cancelled ? (
+                        <span className="inline-flex rounded-full bg-red-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-red-600">
+                          Cancelled
+                        </span>
+                      ) : item.isCompleted ? (
+                        <span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700">
+                          Completed
+                        </span>
+                      ) : (
+                        <span className="inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">
+                          Pending
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        {!item.cancelled && !item.isCompleted && (
+                          <>
+                            <img
+                              onClick={() => cancelAppointment(item._id)}
+                              className="w-10 cursor-pointer transition hover:scale-110"
+                              src={assets.cancel_icon}
+                              alt="Cancel"
+                            />
+                            <img
+                              onClick={() => completeAppointment(item._id)}
+                              className="w-10 cursor-pointer transition hover:scale-110"
+                              src={assets.tick_icon}
+                              alt="Complete"
+                            />
+                          </>
+                        )}
+                        {(item.cancelled || item.isCompleted) && (
+                          <span className="text-xs text-slate-400 italic">
+                            No action
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
