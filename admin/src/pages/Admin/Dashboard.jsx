@@ -9,7 +9,6 @@ const Dashboard = () => {
   const {
     aToken,
     getDashData,
-    cancelAppointment,
     deleteAppointment,
     dashData,
   } = useContext(AdminContext);
@@ -213,14 +212,6 @@ const Dashboard = () => {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        {!item.cancelled && !item.isCompleted && (
-                          <button
-                            onClick={() => cancelAppointment(item._id)}
-                            className="rounded-full bg-slate-900 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-800"
-                          >
-                            Cancel
-                          </button>
-                        )}
                         <button
                           onClick={() => deleteAppointment(item._id)}
                           className="rounded-full border border-red-200 bg-red-50 px-4 py-1.5 text-xs font-semibold text-red-700 transition hover:bg-red-100"

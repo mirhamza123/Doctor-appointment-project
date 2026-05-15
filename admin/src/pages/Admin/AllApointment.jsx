@@ -10,7 +10,6 @@ const AllApointment = () => {
     aToken,
     appointments,
     getAllAppointments,
-    cancelAppointment,
     deleteAppointment,
   } = useContext(AdminContext);
   const { calculateAge, slotDateFormate, currency } = useContext(AppContext);
@@ -146,14 +145,6 @@ const AllApointment = () => {
                   </td>
                   <td className="px-5 py-4">
                     <div className="flex flex-wrap gap-2">
-                      {!item.cancelled && !item.isCompleted && (
-                        <button
-                          onClick={() => cancelAppointment(item._id)}
-                          className="inline-flex items-center rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white transition hover:bg-slate-800"
-                        >
-                          Cancel
-                        </button>
-                      )}
                       <button
                         onClick={() => deleteAppointment(item._id)}
                         className="inline-flex items-center rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700 transition hover:bg-red-100"
