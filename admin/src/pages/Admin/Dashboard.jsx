@@ -225,7 +225,7 @@ const Dashboard = () => {
                           onClick={() => deleteAppointment(item._id)}
                           className="rounded-full border border-red-200 bg-red-50 px-4 py-1.5 text-xs font-semibold text-red-700 transition hover:bg-red-100"
                         >
-                          Delete
+                          Remove
                         </button>
                       </div>
                     </td>

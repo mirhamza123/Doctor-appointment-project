@@ -192,7 +192,9 @@ const allDoctors = async (req, res) => {
 
 const appointmentsAdmin = async (req, res) => {
   try {
-    const appointments = await appointmentModel.find({}).sort({ date: -1 });
+    const appointments = await appointmentModel
+      .find({ isDeletedByAdmin: false })
+      .sort({ date: -1 });
     res.json({ success: true, appointments });
   } catch (error) {
     console.log(error);
@@ -253,9 +255,14 @@ const deleteAppointment = async (req, res) => {
       return res.json({ success: false, message: "Appointment not found" });
     }
 
-    // Just delete the appointment, don't release doctor slot
-    await appointmentModel.findByIdAndDelete(appointmentId);
-    res.json({ success: true, message: "Appointment deleted successfully" });
+    // Soft delete the appointment for Admin view
+    await appointmentModel.findByIdAndUpdate(appointmentId, {
+      isDeletedByAdmin: true,
+    });
+    res.json({
+      success: true,
+      message: "Appointment removed from admin dashboard",
+    });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
@@ -287,7 +294,7 @@ const adminDashboard = async (req, res) => {
   try {
     const doctors = await doctorModel.find({});
     const users = await userModel.find({});
-    const appointments = await appointmentModel.find({});
+    const appointments = await appointmentModel.find({ isDeletedByAdmin: false });
 
     const dashData = {
       doctors: doctors.length,
