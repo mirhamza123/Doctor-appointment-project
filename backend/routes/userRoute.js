@@ -9,6 +9,7 @@ import {
   cancelAppointment,
   paymentStripe,
   verifyRazorpay,
+  deleteAppointmentByUser,
 } from "../controllers/userController.js";
 import authUser from "../middlewares/authUser.js";
 import upload from "../middlewares/multer.js";
@@ -32,5 +33,6 @@ userRouter.post("/cancel-appointment", authUser, cancelAppointment);
 userRouter.post("/payment-stripe", authUser, paymentStripe);
 
 userRouter.post("/verifyRazorpay", authUser, verifyRazorpay);
+userRouter.post("/delete-appointment-user", authUser, deleteAppointmentByUser);
 
 export default userRouter;

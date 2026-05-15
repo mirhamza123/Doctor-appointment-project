@@ -73,6 +73,29 @@ function MyAppointment() {
       toast.error(error.message);
     }
   };
+  const deleteHistory = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(
+        `${backendUrl}/api/user/delete-appointment-user`,
+        { appointmentId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        getuserAppointments();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
+  };
 
   // const initPay = (order) => {
   //   const option = {
@@ -265,6 +288,15 @@ function MyAppointment() {
                 {item.isCompleted && (
                   <button className="sm:min-w-48 py-2 border rounded text-green-600 bg-green-50">
                     Completed
+                  </button>
+                )}
+
+                {(item.cancelled || item.isCompleted) && (
+                  <button
+                    onClick={() => deleteHistory(item._id)}
+                    className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border hover:bg-red-600 hover:text-white transition-all duration-300 cursor-pointer"
+                  >
+                    Delete from History
                   </button>
                 )}
               </div>

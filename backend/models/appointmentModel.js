@@ -15,6 +15,7 @@ const appointmentSchema = new mongoose.Schema({
   payment: { type: Boolean, default: false },
   isCompleted: { type: Boolean, default: false },
   isDeletedByAdmin: { type: Boolean, default: false },
+  isDeletedByUser: { type: Boolean, default: false },
 });
 
 // ✅ Export model safely (prevents re-declaration)

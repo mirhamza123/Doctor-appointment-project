@@ -246,7 +246,7 @@ const listtAppointments = async (req, res) => {
   try {
     const userId = req.userId;
     const appointments = await appointmentModel
-      .find({ userId })
+      .find({ userId, isDeletedByUser: false })
       .populate("docId", "name Image speciality address");
     res.json({ success: true, appointments });
   } catch (error) {
@@ -401,6 +401,39 @@ const verifyRazorpay = async (res, req) => {
   }
 };
 
+const deleteAppointmentByUser = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { appointmentId } = req.body;
+
+    const appointmentData = await appointmentModel.findById(appointmentId);
+    if (!appointmentData) {
+      return res.json({ success: false, message: "Appointment not found" });
+    }
+
+    if (appointmentData.userId !== userId) {
+      return res.json({ success: false, message: "Unauthorized action" });
+    }
+
+    // Only allow deletion if finalized (Completed or Cancelled)
+    if (!appointmentData.cancelled && !appointmentData.isCompleted) {
+      return res.json({
+        success: false,
+        message: "Only completed or cancelled appointments can be removed",
+      });
+    }
+
+    await appointmentModel.findByIdAndUpdate(appointmentId, {
+      isDeletedByUser: true,
+    });
+
+    res.json({ success: true, message: "Appointment removed from history" });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
 export {
   registerUser,
   loginUser,
@@ -411,4 +444,5 @@ export {
   cancelAppointment,
   paymentStripe,
   verifyRazorpay,
+  deleteAppointmentByUser,
 };
