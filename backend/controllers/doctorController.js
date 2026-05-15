@@ -220,7 +220,7 @@ const doctorProfile = async (req, res) => {
 const updateDoctorProfile = async (req, res) => {
   try {
     const docId = req.docId;
-    let { fee, addres, available } = req.body;
+    let { fee, addres, available, about } = req.body;
 
     // If frontend sends JSON string, parse it safely
     if (typeof addres === "string") {
@@ -233,7 +233,7 @@ const updateDoctorProfile = async (req, res) => {
 
     await doctorModel.findByIdAndUpdate(
       docId,
-      { fee, addres, available },
+      { fee, addres, available, about },
       { new: true }
     );
 

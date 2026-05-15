@@ -43,6 +43,7 @@ const DoctorProfile = () => {
         addres: profileData.addres,
         fee: profileData.fee,
         available: profileData.available,
+        about: profileData.about,
       };
 
       const { data } = await axios.post(
@@ -107,9 +108,24 @@ const DoctorProfile = () => {
             <p className="flex items-center gap-1 text-sm font-medium text-neutral-800 mt-3">
               About:
             </p>
-            <p className="text-sm text-gray-600 max-w-[700px] mt-1">
-              {profileData.about}
-            </p>
+            {isEdit ? (
+              <textarea
+                onChange={(e) =>
+                  setProfileData((prev) => ({
+                    ...prev,
+                    about: e.target.value,
+                  }))
+                }
+                value={profileData.about || ""}
+                rows={8}
+                className="w-full border rounded-lg p-3 mt-2 text-sm text-gray-600 outline-primary bg-slate-50 focus:bg-white transition-all"
+                placeholder="Write a brief biography about yourself..."
+              />
+            ) : (
+              <p className="text-sm text-gray-600 max-w-[700px] mt-1">
+                {profileData.about}
+              </p>
+            )}
           </div>
 
           {/* Fee */}
