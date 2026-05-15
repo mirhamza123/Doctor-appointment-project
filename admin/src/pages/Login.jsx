@@ -452,7 +452,7 @@ function Login() {
               </button>
             </div>
           </div>
-          <button className="bg-[#5f6fff] text-white w-full py-2 rounded-md text-base cursor-pointer">
+          <button className="bg-[#5f6fff] hover:bg-indigo-700 transition-all duration-300 text-white w-full py-2 rounded-md text-base cursor-pointer">
             Login
           </button>
 
@@ -460,7 +460,7 @@ function Login() {
             <p>
               Doctor Login?{" "}
               <span
-                className="text-[#5f6fff] underline cursor-pointer"
+                className="text-[#5f6fff] hover:text-indigo-800 transition-all underline cursor-pointer"
                 onClick={() => setState("Doctor")}
               >
                 Click here
@@ -470,7 +470,7 @@ function Login() {
             <p>
               Admin Login?{" "}
               <span
-                className="text-[#5f6fff] underline cursor-pointer"
+                className="text-[#5f6fff] hover:text-indigo-800 transition-all underline cursor-pointer"
                 onClick={() => setState("Admin")}
               >
                 Click here
