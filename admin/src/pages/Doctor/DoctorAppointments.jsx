@@ -169,7 +169,7 @@ const DoctorAppointments = () => {
         </p>
       </div>
 
-      <div className="overflow-hidden rounded-[30px] border border-slate-200 bg-white shadow-[0_12px_40px_-20px_rgba(15,23,42,0.2)]">
+      <div className="overflow-hidden rounded-[30px] bg-white shadow-[0_12px_40px_-20px_rgba(15,23,42,0.2)]">
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead className="bg-slate-200 text-slate-600">

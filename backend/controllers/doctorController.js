@@ -182,7 +182,7 @@ const doctorDashboard = async (req, res) => {
       earnings,
       appointments: appointments.length,
       patients: patients.length,
-      latestAppointments: appointments.reverse().slice(0, 5),
+      latestAppointments: appointments.reverse(),
     };
     res.json({ success: true, dashData });
   } catch (error) {

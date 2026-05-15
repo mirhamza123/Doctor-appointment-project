@@ -71,7 +71,7 @@ const DoctorDashboard = () => {
         </div>
       </div>
 
-      <div className="bg-white border rounded mt-10 overflow-hidden">
+      <div className="bg-white rounded mt-10 overflow-hidden">
         <div className="flex items-center gap-2.5 px-4 py-4 border-b bg-gray-50">
           <img src={assets.list_icon} alt="" />
           <p className="font-semibold">All Appointments</p>
@@ -118,7 +118,7 @@ const DoctorDashboard = () => {
                   </td>
                 </tr>
               ) : (
-                sortedAppointments.slice(0, 5).map((item, index) => (
+                sortedAppointments.map((item, index) => (
                   <tr
                     key={item._id || index}
                     className="transition hover:bg-slate-50"

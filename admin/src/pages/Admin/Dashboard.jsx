@@ -86,7 +86,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="mt-10 overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
+        <div className="mt-10 overflow-hidden rounded-[28px] bg-white shadow-sm">
           <div className="flex items-center gap-3 border-b border-slate-200 bg-slate-50 px-6 py-5">
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-700">
               <img
