@@ -15,6 +15,7 @@ import DoctorContextProvider, { DoctorContext } from "./context/DoctorContext";
 import DoctorDashboard from "./pages/Doctor/DoctorDashboard";
 import DoctorAppointments from "./pages/Doctor/DoctorAppointments";
 import DoctorProfile from "./pages/Doctor/DoctorProfile";
+import DoctorSettings from "./pages/Doctor/DoctorSettings";
 
 function App() {
   const { aToken } = useContext(AdminContext);
@@ -27,20 +28,35 @@ function App() {
       <div className="flex items-start w-full">
         <Sidebar />
         <main className="flex-1 min-w-0 w-full">
-        <Routes>
-          <Route path="/" element={<Navigate to={aToken ? "/admin-dashboard" : "/doctor-dashboard"} replace />} />
-          <Route path="/admin" element={<Navigate to="/admin-dashboard" replace />} />
-          {/* admin routes */}
-          <Route path="/admin-dashboard" element={<Dashboard />} />
-          <Route path="/alll-apointments" element={<AllApointment />} />
-          <Route path="/add-doctor" element={<AddDoctor />} />
-          <Route path="/doctor-list" element={<DoctorLIST />} />
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <Navigate
+                  to={aToken ? "/admin-dashboard" : "/doctor-dashboard"}
+                  replace
+                />
+              }
+            />
+            <Route
+              path="/admin"
+              element={<Navigate to="/admin-dashboard" replace />}
+            />
+            {/* admin routes */}
+            <Route path="/admin-dashboard" element={<Dashboard />} />
+            <Route path="/alll-apointments" element={<AllApointment />} />
+            <Route path="/add-doctor" element={<AddDoctor />} />
+            <Route path="/doctor-list" element={<DoctorLIST />} />
 
-          {/* doctor routes */}
-          <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
-          <Route path="/doctor-appointments" element={<DoctorAppointments />} />
-          <Route path="/doctor-profile" element={<DoctorProfile />} />
-        </Routes>
+            {/* doctor routes */}
+            <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
+            <Route
+              path="/doctor-appointments"
+              element={<DoctorAppointments />}
+            />
+            <Route path="/doctor-profile" element={<DoctorProfile />} />
+            <Route path="/doctor-settings" element={<DoctorSettings />} />
+          </Routes>
         </main>
       </div>
     </div>

@@ -234,12 +234,88 @@ const updateDoctorProfile = async (req, res) => {
     await doctorModel.findByIdAndUpdate(
       docId,
       { fee, addres, available, about },
-      { new: true }
+      { new: true },
     );
 
     res.json({ success: true, message: "Profile updated successfully" });
   } catch (error) {
     console.error("Error updating doctor profile:", error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// API to change doctor email
+const changeEmail = async (req, res) => {
+  try {
+    const docId = req.docId;
+    const { newEmail } = req.body;
+
+    if (!newEmail || typeof newEmail !== "string") {
+      return res.json({ success: false, message: "Invalid email format" });
+    }
+
+    // Trim and lowercase email
+    const email = newEmail.trim().toLowerCase();
+
+    // Check if email already exists
+    const existingDoctor = await doctorModel.findOne({ email });
+    if (existingDoctor && existingDoctor._id.toString() !== docId.toString()) {
+      return res.json({ success: false, message: "Email already in use" });
+    }
+
+    // Update email
+    await doctorModel.findByIdAndUpdate(docId, { email });
+    res.json({ success: true, message: "Email updated successfully" });
+  } catch (error) {
+    console.error("Error changing email:", error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// API to change doctor password
+const changePassword = async (req, res) => {
+  try {
+    const docId = req.docId;
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.json({
+        success: false,
+        message: "Please provide both current and new password",
+      });
+    }
+
+    // Get doctor from database
+    const doctor = await doctorModel.findById(docId);
+    if (!doctor) {
+      return res.json({ success: false, message: "Doctor not found" });
+    }
+
+    // Verify current password
+    const isMatch = await bcrypt.compare(currentPassword, doctor.password);
+    if (!isMatch) {
+      return res.json({
+        success: false,
+        message: "Current password is incorrect",
+      });
+    }
+
+    // Check if new password is different from current
+    if (currentPassword === newPassword) {
+      return res.json({
+        success: false,
+        message: "New password must be different from current password",
+      });
+    }
+
+    // Hash and update new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    await doctorModel.findByIdAndUpdate(docId, { password: hashedPassword });
+    res.json({ success: true, message: "Password changed successfully" });
+  } catch (error) {
+    console.error("Error changing password:", error);
     res.json({ success: false, message: error.message });
   }
 };
@@ -254,4 +330,6 @@ export {
   doctorDashboard,
   doctorProfile,
   updateDoctorProfile,
+  changeEmail,
+  changePassword,
 };

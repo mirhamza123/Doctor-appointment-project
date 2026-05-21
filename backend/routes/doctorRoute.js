@@ -8,6 +8,8 @@ import {
   doctorDashboard,
   doctorProfile,
   updateDoctorProfile,
+  changeEmail,
+  changePassword,
 } from "../controllers/doctorController.js";
 import authDoctor from "../middlewares/authDoctor.js";
 
@@ -20,5 +22,7 @@ router.post("/cancel-appointment", authDoctor, appointmentCancel);
 router.get("/dashboard", authDoctor, doctorDashboard);
 router.get("/profile", authDoctor, doctorProfile);
 router.post("/update-profile", authDoctor, updateDoctorProfile);
+router.post("/change-email", authDoctor, changeEmail);
+router.post("/change-password", authDoctor, changePassword);
 
 export default router;
