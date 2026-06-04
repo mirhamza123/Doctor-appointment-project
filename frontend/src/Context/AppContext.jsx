@@ -11,7 +11,7 @@ const AppContextProvider = (props) => {
 
   const [doctors, setDoctors] = useState([]);
   const [token, setToken] = useState(
-    localStorage.getItem("token") ? localStorage.getItem("token") : false
+    localStorage.getItem("token") ? localStorage.getItem("token") : false,
   );
 
   const [userData, setUserData] = useState(false);
@@ -46,6 +46,23 @@ const AppContextProvider = (props) => {
     }
   };
 
+  // Doctor self-registration function
+  const registerDoctor = async (formData) => {
+    try {
+      const { data } = await axios.post(
+        `${backendUrl}/api/admin/doctor-register`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        },
+      );
+      return data;
+    } catch (error) {
+      console.error(error);
+      return { success: false, message: error.message };
+    }
+  };
+
   const value = {
     doctors,
     getDoctorData,
@@ -56,6 +73,7 @@ const AppContextProvider = (props) => {
     userData,
     setUserData,
     loadUserProfile,
+    registerDoctor,
   };
 
   useEffect(() => {

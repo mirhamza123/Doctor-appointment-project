@@ -9,6 +9,7 @@ import Login from "./Pages/Login";
 import MyAppointment from "./Pages/MyAppointment";
 import MyProfle from "./Pages/MyProfile";
 import Appointment from "./Pages/Appointment";
+import DoctorRegister from "./Pages/DoctorRegister";
 import Navbar from "./Component/Navbar";
 import Footer from "./Component/Footer";
 // import Chatbot from "./component/ChatBot";
@@ -30,6 +31,7 @@ function App() {
         <Route path="/My-Profile" element={<MyProfle />} />
         <Route path="My-Appointment" element={<MyAppointment />} />
         <Route path="/appointment/:docId" element={<Appointment />} />
+        <Route path="/doctor-register" element={<DoctorRegister />} />
       </Routes>
       <Footer />
       {/* <Chatbot /> */}

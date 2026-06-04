@@ -15,8 +15,9 @@ const doctorSchema = new mongoose.Schema(
     addres: { type: Object, required: true },
     date: { type: Number, required: true },
     slot_booked: { type: Object, default: {} },
+    isVerified: { type: Boolean, default: false },
   },
-  { minimize: false }
+  { minimize: false },
 );
 
 const doctorModel =

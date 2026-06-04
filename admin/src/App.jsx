@@ -11,6 +11,7 @@ import Dashboard from "./pages/Admin/Dashboard";
 import AllApointment from "./pages/Admin/AllApointment";
 import AddDoctor from "./pages/Admin/AddDoctor";
 import DoctorLIST from "./pages/Admin/DoctorList";
+import PendingDoctors from "./pages/Admin/PendingDoctors";
 import DoctorContextProvider, { DoctorContext } from "./context/DoctorContext";
 import DoctorDashboard from "./pages/Doctor/DoctorDashboard";
 import DoctorAppointments from "./pages/Doctor/DoctorAppointments";
@@ -47,6 +48,7 @@ function App() {
             <Route path="/alll-apointments" element={<AllApointment />} />
             <Route path="/add-doctor" element={<AddDoctor />} />
             <Route path="/doctor-list" element={<DoctorLIST />} />
+            <Route path="/pending-doctors" element={<PendingDoctors />} />
 
             {/* doctor routes */}
             <Route path="/doctor-dashboard" element={<DoctorDashboard />} />

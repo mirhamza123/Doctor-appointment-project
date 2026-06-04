@@ -74,19 +74,23 @@ function Navbar() {
             </div>
           </div>
         ) : (
-          <button
-            onClick={() => Navigate("/Login")}
-            className="bg-primary text-white px-6 md:px-8 py-3 md:py-3.5 rounded-full font-medium text-sm md:text-base tracking-wide cursor-pointer hover:bg-blue-500 transition-all duration-300 shadow-md"
-          >
-            Create Account
-          </button>
-
-          // <button
-          //   onClick={() => Navigate("/Login")}
-          //   className="bg-primary text-white px-8  py-3  rounded-full font-light  cursor-pointer hover:bg-blue-400 transition-all duration-300 "
-          // >
-          //   Create Account
-          // </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                Navigate("/doctor-register");
+                handleScrollToTop();
+              }}
+              className="hidden md:block border-2 border-blue-600 text-blue-600 px-6 py-2 rounded-full font-medium text-sm hover:bg-blue-50 transition-all duration-300 cursor-pointer"
+            >
+              Join as Doctor
+            </button>
+            <button
+              onClick={() => Navigate("/Login")}
+              className="bg-primary text-white px-6 md:px-8 py-3 md:py-3.5 rounded-full font-medium text-sm md:text-base tracking-wide cursor-pointer hover:bg-blue-500 transition-all duration-300 shadow-md"
+            >
+              Create Account
+            </button>
+          </div>
         )}
         <img
           onClick={() => setShowMenu(true)}
@@ -123,6 +127,13 @@ function Navbar() {
             <NavLink onClick={() => setShowMenu(false)} to="/contact">
               <p className="px-4 py-2 rounded inline-block">Contact</p>
             </NavLink>
+            {!token && (
+              <NavLink onClick={() => setShowMenu(false)} to="/doctor-register">
+                <p className="px-4 py-2 rounded inline-block text-blue-600 font-semibold">
+                  Join as Doctor
+                </p>
+              </NavLink>
+            )}
           </ul>
         </div>
       </div>

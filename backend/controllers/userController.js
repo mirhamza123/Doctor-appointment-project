@@ -197,6 +197,15 @@ const bookAppointment = async (req, res) => {
     if (!docData) {
       return res.json({ success: false, message: "Doctor not found" });
     }
+
+    // Check if doctor is verified
+    if (!docData.isVerified) {
+      return res.json({
+        success: false,
+        message: "Doctor profile is awaiting approval",
+      });
+    }
+
     if (!docData.available) {
       return res.json({ success: false, message: "Doctor not available" });
     }

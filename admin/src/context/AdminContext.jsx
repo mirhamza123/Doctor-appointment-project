@@ -12,11 +12,10 @@ const AdminContextProvider = (props) => {
   const [doctors, setDoctors] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [dashData, setDashData] = useState(false);
+  const [pendingDoctors, setPendingDoctors] = useState([]);
 
   // Production: use "" = same-origin, proxy forwards to backend (avoids CORS)
-  const backendUrl = import.meta.env.PROD
-    ? ""
-    : ""; // Use proxy for development
+  const backendUrl = import.meta.env.PROD ? "" : ""; // Use proxy for development
 
   const getalldoctor = async () => {
     try {
@@ -28,6 +27,42 @@ const AdminContextProvider = (props) => {
       if (data.success) {
         setDoctors(data.doctors);
         console.log(data.doctors);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const getPendingDoctors = async () => {
+    try {
+      const { data } = await axios.get(
+        `${backendUrl}/api/admin/pending-doctors`,
+        { headers: { aToken } },
+      );
+      if (data.success) {
+        setPendingDoctors(data.pendingDoctors);
+        console.log("Pending doctors:", data.pendingDoctors);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const verifyDoctor = async (docId, isApproved) => {
+    try {
+      const { data } = await axios.post(
+        `${backendUrl}/api/admin/verify-doctor`,
+        { docId, isApproved },
+        { headers: { aToken } },
+      );
+      if (data.success) {
+        toast.success(data.message);
+        getPendingDoctors();
+        getalldoctor();
       } else {
         toast.error(data.message);
       }
@@ -88,8 +123,6 @@ const AdminContextProvider = (props) => {
     }
   };
 
-
-
   const deleteAppointment = async (appointmentId) => {
     try {
       const { data } = await axios.post(
@@ -138,6 +171,9 @@ const AdminContextProvider = (props) => {
     deleteAppointment,
     dashData,
     getDashData,
+    pendingDoctors,
+    getPendingDoctors,
+    verifyDoctor,
   };
   return (
     <AdminContext.Provider value={value}>

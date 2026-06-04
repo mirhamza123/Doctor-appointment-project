@@ -19,10 +19,9 @@ const addDoctor = async (req, res) => {
       about,
       fees,
       address,
+      isFromFrontend,
     } = req.body;
     const imageFile = req.file;
-    //    console.log("image file",imageFile)
-    //    console.log({ name, email, password, speciality, degree, experience,about, fees, address},imageFile)
 
     if (
       !name ||
@@ -77,24 +76,32 @@ const addDoctor = async (req, res) => {
       imageUrl = imageUpload.secure_url;
     }
 
-    // ...existing code...
     const doctorData = {
       name,
       email,
-      Image: imageUrl, // changed from image
+      Image: imageUrl,
       password: hashedPassword,
       speciality,
       degree,
       experience,
       about,
-      fee: fees, // changed from fees
-      addres: address, // changed from address
-      date: Date.now(), // changed from data
+      fee: fees,
+      addres: address,
+      date: Date.now(),
+      isVerified: isFromFrontend ? false : true, // Frontend registrations are unverified by default
     };
 
     // Create a new doctor document in the database
     const newDoctor = new doctorModel(doctorData);
     await newDoctor.save();
+
+    if (isFromFrontend) {
+      return res.json({
+        success: true,
+        message: "Registration submitted! Awaiting Admin Approval.",
+      });
+    }
+
     res.json({ success: true, message: "Doctor added successfully" });
   } catch (error) {
     console.log(error);
@@ -182,6 +189,74 @@ const allDoctors = async (req, res) => {
   try {
     const doctors = await doctorModel.find({}).select("-password");
     res.json({ success: true, doctors });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// API to get pending doctors (unverified) for admin approval
+const getPendingDoctors = async (req, res) => {
+  try {
+    const pendingDoctors = await doctorModel
+      .find({ isVerified: false })
+      .select("-password");
+    res.json({ success: true, pendingDoctors });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// API to verify/approve a doctor registration
+const verifyDoctor = async (req, res) => {
+  try {
+    const { docId, isApproved } = req.body;
+
+    if (!docId) {
+      return res.json({ success: false, message: "Doctor ID is required" });
+    }
+
+    const doctor = await doctorModel.findById(docId);
+    if (!doctor) {
+      return res.json({ success: false, message: "Doctor not found" });
+    }
+
+    if (isApproved) {
+      // Approve the doctor
+      await doctorModel.findByIdAndUpdate(docId, { isVerified: true });
+      res.json({
+        success: true,
+        message:
+          "Doctor approved successfully! Profile is now visible on the website.",
+      });
+    } else {
+      // Reject/delete the doctor registration
+      await doctorModel.findByIdAndDelete(docId);
+      res.json({
+        success: true,
+        message: "Doctor registration rejected and removed.",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// API to bulk verify all existing doctors (for migration)
+const bulkVerifyDoctors = async (req, res) => {
+  try {
+    const result = await doctorModel.updateMany(
+      { isVerified: { $exists: false } },
+      { $set: { isVerified: true } },
+    );
+
+    res.json({
+      success: true,
+      message: `${result.modifiedCount} doctors verified successfully!`,
+      modifiedCount: result.modifiedCount,
+    });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
@@ -294,7 +369,9 @@ const adminDashboard = async (req, res) => {
   try {
     const doctors = await doctorModel.find({});
     const users = await userModel.find({});
-    const appointments = await appointmentModel.find({ isDeletedByAdmin: false });
+    const appointments = await appointmentModel.find({
+      isDeletedByAdmin: false,
+    });
 
     const dashData = {
       doctors: doctors.length,
@@ -319,4 +396,7 @@ export {
   deleteAppointment,
   adminDashboard,
   deleteDoctor,
+  getPendingDoctors,
+  verifyDoctor,
+  bulkVerifyDoctors,
 };

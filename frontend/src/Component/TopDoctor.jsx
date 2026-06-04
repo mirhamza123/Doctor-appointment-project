@@ -19,7 +19,7 @@ function TopDoctor() {
           <div
             key={index}
             onClick={() => {
-              Navigate(`/Appointment/${item._id}`), scrollTo(0, 0);
+              (Navigate(`/Appointment/${item._id}`), window.scrollTo(0, 0));
             }}
             className="border border-blue-300 rounded-xl  overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-500"
           >
@@ -27,7 +27,7 @@ function TopDoctor() {
             <div className="p-4">
               <div
                 className={`flex items-center gap-2 text-sm text-center  ${
-                  item.Available ? "text-green-500" : "text-gray-500"
+                  item.available ? "text-green-500" : "text-gray-500"
                 } `}
               >
                 <p
@@ -41,6 +41,12 @@ function TopDoctor() {
                 <p className="text-sm font-bold">{item.name}</p>
                 <p className="text-gray-600 text-sm">{item.speciality}</p>
               </div>
+              {/* Verification Status - Show for unverified doctors */}
+              {item.isVerified === false && (
+                <div className="mt-2 px-3 py-1.5 bg-yellow-100 border-2 border-yellow-400 rounded-full text-xs text-yellow-800 font-bold text-center">
+                  ⏳ Awaiting Approval
+                </div>
+              )}
             </div>
           </div>
         ))}
@@ -48,7 +54,7 @@ function TopDoctor() {
       <button
         onClick={() => {
           Navigate("/doctors");
-          scrollTo(0, 0);
+          window.scrollTo(0, 0);
         }}
         className="bg-blue-100 text-gray-600 px-12 py-3 rounded-full mt-10 cursor-pointer"
       >

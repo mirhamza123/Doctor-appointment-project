@@ -142,6 +142,12 @@ function Doctors() {
                   <p className="text-sm font-bold">{item.name}</p>
                   <p className="text-gray-600 text-sm">{item.speciality}</p>
                 </div>
+                {/* Verification Status - Show for unverified doctors */}
+                {item.isVerified === false && (
+                  <div className="mt-2 px-3 py-1.5 bg-yellow-100 border-2 border-yellow-400 rounded-full text-xs text-yellow-800 font-bold text-center">
+                    ⏳ Awaiting Approval
+                  </div>
+                )}
               </div>
             </div>
           ))}
