@@ -10,6 +10,8 @@ import {
   updateDoctorProfile,
   changeEmail,
   changePassword,
+  updateAvailableSlots,
+  updateAvailableSchedule,
 } from "../controllers/doctorController.js";
 import authDoctor from "../middlewares/authDoctor.js";
 
@@ -24,5 +26,7 @@ router.get("/profile", authDoctor, doctorProfile);
 router.post("/update-profile", authDoctor, updateDoctorProfile);
 router.post("/change-email", authDoctor, changeEmail);
 router.post("/change-password", authDoctor, changePassword);
+router.post("/update-available-slots", authDoctor, updateAvailableSlots);
+router.post("/update-available-schedule", authDoctor, updateAvailableSchedule);
 
 export default router;

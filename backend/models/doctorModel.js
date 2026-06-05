@@ -15,6 +15,21 @@ const doctorSchema = new mongoose.Schema(
     addres: { type: Object, required: true },
     date: { type: Number, required: true },
     slot_booked: { type: Object, default: {} },
+    availableSlots: { type: [String], default: [] }, // Legacy: Array of available time slots
+    availableSchedule: {
+      type: [
+        {
+          day: {
+            type: String,
+            enum: ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"],
+            required: true,
+          },
+          isActive: { type: Boolean, default: false },
+          slots: { type: [String], default: [] }, // e.g., ["08:00 AM", "08:30 AM", "09:00 AM"]
+        },
+      ],
+      default: [],
+    },
     isVerified: { type: Boolean, default: false },
   },
   { minimize: false },

@@ -321,6 +321,93 @@ const changePassword = async (req, res) => {
   }
 };
 
+// API to save/update doctor's available time slots
+const updateAvailableSlots = async (req, res) => {
+  try {
+    const docId = req.docId;
+    const { availableSlots } = req.body;
+
+    // Validate that availableSlots is an array
+    if (!Array.isArray(availableSlots)) {
+      return res.json({
+        success: false,
+        message: "Available slots must be an array",
+      });
+    }
+
+    // Update doctor's available slots
+    const updatedDoctor = await doctorModel.findByIdAndUpdate(
+      docId,
+      { availableSlots },
+      { new: true },
+    );
+
+    res.json({
+      success: true,
+      message: "Available slots updated successfully",
+      availableSlots: updatedDoctor.availableSlots,
+    });
+  } catch (error) {
+    console.error("Error updating available slots:", error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// API to save/update doctor's available schedule (days and time slots)
+const updateAvailableSchedule = async (req, res) => {
+  try {
+    const docId = req.docId;
+    const { availableSchedule } = req.body;
+
+    // Validate that availableSchedule is an array
+    if (!Array.isArray(availableSchedule)) {
+      return res.json({
+        success: false,
+        message: "Available schedule must be an array",
+      });
+    }
+
+    // Validate schedule structure
+    const validDays = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+    for (let schedule of availableSchedule) {
+      if (!validDays.includes(schedule.day)) {
+        return res.json({
+          success: false,
+          message: `Invalid day: ${schedule.day}`,
+        });
+      }
+      if (typeof schedule.isActive !== "boolean") {
+        return res.json({
+          success: false,
+          message: "isActive must be a boolean",
+        });
+      }
+      if (!Array.isArray(schedule.slots)) {
+        return res.json({
+          success: false,
+          message: "Slots must be an array",
+        });
+      }
+    }
+
+    // Update doctor's available schedule
+    const updatedDoctor = await doctorModel.findByIdAndUpdate(
+      docId,
+      { availableSchedule },
+      { new: true },
+    );
+
+    res.json({
+      success: true,
+      message: "Available schedule updated successfully",
+      availableSchedule: updatedDoctor.availableSchedule,
+    });
+  } catch (error) {
+    console.error("Error updating available schedule:", error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
 export {
   changeAvailability,
   doctorList,
@@ -333,4 +420,6 @@ export {
   updateDoctorProfile,
   changeEmail,
   changePassword,
+  updateAvailableSlots,
+  updateAvailableSchedule,
 };

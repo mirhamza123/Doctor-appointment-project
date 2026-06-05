@@ -9,7 +9,7 @@ const DoctorContextProvider = (props) => {
   // Production: use "" = same-origin, proxy forwards to backend (avoids CORS)
   const backendUrl = import.meta.env.PROD ? "" : ""; // Use proxy for development
   const [dtoken, setDtoken] = useState(
-    localStorage.getItem("dToken") ? localStorage.getItem("dToken") : ""
+    localStorage.getItem("dToken") ? localStorage.getItem("dToken") : "",
   );
 
   const [appointments, setAppointments] = useState([]);
@@ -24,7 +24,7 @@ const DoctorContextProvider = (props) => {
           headers: {
             dtoken: dtoken,
           },
-        }
+        },
       );
       if (data.success) {
         setAppointments(data.appointments);
@@ -49,7 +49,7 @@ const DoctorContextProvider = (props) => {
           headers: {
             dtoken: dtoken,
           },
-        }
+        },
       );
 
       if (data.success) {
@@ -75,7 +75,7 @@ const DoctorContextProvider = (props) => {
           headers: {
             dtoken: dtoken,
           },
-        }
+        },
       );
 
       if (data.success) {

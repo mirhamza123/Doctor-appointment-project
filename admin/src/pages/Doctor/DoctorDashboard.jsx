@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useMemo } from "react";
 import { DoctorContext } from "../../context/DoctorContext";
 import { assets } from "../../assets/assets.js";
 import { AppContext } from "../../context/AppContext.jsx";
+import DoctorTimeSlotManager from "./DoctorTimeSlotManager.jsx";
 
 const DoctorDashboard = () => {
   const {
@@ -27,8 +28,18 @@ const DoctorDashboard = () => {
     list.sort((a, b) => {
       const partsA = (a.slotDate || "").split("_");
       const partsB = (b.slotDate || "").split("_");
-      const keyA = (partsA[2] || "") + (partsA[1] || "").padStart(2, "0") + (partsA[0] || "").padStart(2, "0") + " " + (a.slotTime || "");
-      const keyB = (partsB[2] || "") + (partsB[1] || "").padStart(2, "0") + (partsB[0] || "").padStart(2, "0") + " " + (b.slotTime || "");
+      const keyA =
+        (partsA[2] || "") +
+        (partsA[1] || "").padStart(2, "0") +
+        (partsA[0] || "").padStart(2, "0") +
+        " " +
+        (a.slotTime || "");
+      const keyB =
+        (partsB[2] || "") +
+        (partsB[1] || "").padStart(2, "0") +
+        (partsB[0] || "").padStart(2, "0") +
+        " " +
+        (b.slotTime || "");
       return keyB.localeCompare(keyA);
     });
     return list;
@@ -70,6 +81,9 @@ const DoctorDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Time Slot Manager Component */}
+      <DoctorTimeSlotManager />
 
       <div className="bg-white rounded mt-10 overflow-hidden">
         <div className="flex items-center gap-2.5 px-4 py-4 border-b bg-gray-50">

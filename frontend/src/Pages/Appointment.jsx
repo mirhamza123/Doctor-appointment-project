@@ -21,33 +21,94 @@ function Appointment() {
   const [SlotTime, setSlotTime] = useState("");
 
   const fetchInfo = async () => {
-    const docInfo = doctors.find((item) => item._id === docId);
-    setDocInfo(docInfo);
-    console.log("Doctor Info:", docInfo);
+    try {
+      // First try to get from context
+      let docInfo = doctors.find((item) => item._id === docId);
+
+      // Always fetch fresh data from API to get latest availableSchedule
+      try {
+        const { data } = await axios.get(`${backendUrl}/api/doctor/list`);
+        if (data.success && data.doctors) {
+          const freshDocInfo = data.doctors.find((item) => item._id === docId);
+          if (freshDocInfo) {
+            docInfo = freshDocInfo; // Use fresh data from API
+            console.log("Fresh doctor data loaded:", docInfo);
+          }
+        }
+      } catch (error) {
+        console.log(
+          "Could not fetch fresh doctor data, using context data:",
+          error,
+        );
+      }
+
+      if (docInfo) {
+        setDocInfo(docInfo);
+        console.log("Doctor Info set:", docInfo);
+      } else {
+        console.log("No doctor info found for ID:", docId);
+      }
+    } catch (error) {
+      console.error("Error fetching doctor info:", error);
+      toast.error("Failed to load doctor information");
+    }
   };
 
   const getAvailableSlots = async () => {
+    if (!docInfo) return;
+
     setDocSlots([]);
     //  geting current date
     let today = new Date();
+    let allDocSlots = []; // Collect all slots first
+
+    // Check if doctor has configured the new schedule system
+    const hasConfiguredSchedule =
+      docInfo.availableSchedule &&
+      docInfo.availableSchedule.length > 0 &&
+      docInfo.availableSchedule.some((s) => s.isActive);
+
+    console.log("Doctor availableSchedule:", docInfo.availableSchedule);
+    console.log("Has configured schedule:", hasConfiguredSchedule);
+
     for (let i = 0; i < 7; i++) {
       let currentDate = new Date(today);
       currentDate.setDate(today.getDate() + i);
+
+      // Get day name (MON, TUE, WED, THU, FRI, SAT, SUN)
+      const dayIndex = currentDate.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+      const dayNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+      const currentDayName = dayNames[dayIndex];
+
+      // Find doctor's schedule for this day
+      const doctorSchedule = docInfo.availableSchedule?.find(
+        (s) => s.day === currentDayName,
+      );
+
+      // If no schedule configured, default to all days active with all slots available (backward compatibility)
+      // If schedule is configured, use the configured values
+      const isDayActive = hasConfiguredSchedule
+        ? doctorSchedule?.isActive || false
+        : true; // Default to active if no schedule configured
+      const availableSlotsForDay = hasConfiguredSchedule
+        ? doctorSchedule?.slots || []
+        : []; // Will check legacy availableSlots below
 
       // setting endtime
       let endTime = new Date();
       endTime.setDate(today.getDate() + i);
       endTime.setHours(22, 0, 0, 0);
 
-      // setting hours
+      // setting hours - start from 08:00 AM for all days
+      currentDate.setHours(8);
+      currentDate.setMinutes(0);
+
+      // For today, skip slots that have already passed
       if (today.getDate() === currentDate.getDate()) {
-        currentDate.setHours(
-          currentDate.getHours() > 10 ? currentDate.getHours() + 1 : 10
-        );
-        currentDate.setMinutes(currentDate.getMinutes() > 30 ? 30 : 0);
-      } else {
-        currentDate.setHours(10);
-        currentDate.setMinutes(0);
+        const now = new Date();
+        while (currentDate < now) {
+          currentDate.setMinutes(currentDate.getMinutes() + 30);
+        }
       }
 
       let timeSlots = [];
@@ -65,36 +126,104 @@ function Appointment() {
         const slotDate = day + "_" + month + "_" + year;
         const slotTime = formatedTime;
 
-        const isSlotAvailable =
+        // Check if slot is already booked
+        const isSlotBooked =
           docInfo.slot_booked[slotDate] &&
-          docInfo.slot_booked[slotDate].includes(slotTime)
-            ? false
-            : true;
+          docInfo.slot_booked[slotDate].includes(slotTime);
 
-        if (isSlotAvailable) {
-          timeSlots.push({
-            datetime: new Date(currentDate),
-            time: formatedTime,
-          });
+        // Check if slot is in doctor's available slots for this day
+        let isDoctorAvailable;
+
+        if (hasConfiguredSchedule) {
+          // Use new schedule system (doctor has configured days/slots)
+          isDoctorAvailable =
+            isDayActive && availableSlotsForDay.includes(slotTime);
+        } else if (
+          docInfo.availableSlots &&
+          docInfo.availableSlots.length > 0
+        ) {
+          // Use legacy availableSlots system (old simple slots array)
+          isDoctorAvailable = docInfo.availableSlots.includes(slotTime);
+        } else {
+          // No configuration - show all slots as available (default behavior)
+          isDoctorAvailable = true;
         }
+
+        // Slot should only be bookable if it's not booked AND doctor has it available
+        const isSlotAvailable = !isSlotBooked && isDoctorAvailable;
+
+        // Add all slots (booked, unavailable, and available) to display them all
+        timeSlots.push({
+          datetime: new Date(currentDate),
+          time: formatedTime,
+          isAvailable: isSlotAvailable,
+          isDoctorAvailable: isDoctorAvailable,
+        });
 
         currentDate.setMinutes(currentDate.getMinutes() + 30);
       }
-      setDocSlots((prev) => [...prev, timeSlots]);
+
+      // Add this day's slots to the array
+      allDocSlots.push({
+        daySlots: timeSlots,
+        dayName: currentDayName,
+        isDayActive,
+        dayDate: currentDate.getDate(),
+      });
+    }
+
+    // Sort days in calendar week order (MON=1, TUE=2, ..., SUN=0)
+    const dayOrder = { MON: 1, TUE: 2, WED: 3, THU: 4, FRI: 5, SAT: 6, SUN: 0 };
+    allDocSlots.sort((a, b) => dayOrder[a.dayName] - dayOrder[b.dayName]);
+
+    // Set all slots at once, not in a loop
+    setDocSlots(allDocSlots);
+
+    // Find today's day index in the sorted array and set it as default
+    const todayDayIndex = today.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    const todayDayNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+    const todayDayName = todayDayNames[todayDayIndex];
+    const todaySlotIndex = allDocSlots.findIndex(
+      (slot) => slot.dayName === todayDayName,
+    );
+    if (todaySlotIndex !== -1) {
+      setSlotIndex(todaySlotIndex);
     }
   };
 
   const bookAppointment = async () => {
     if (!token) {
-      toast.warn("login to  book appiontment");
+      toast.warn("login to book appointment");
       return navigate("/login");
     }
-    try {
-      const date = docSlots[SlotIndex][0].datetime;
 
-      let day = date.getDate();
-      let month = date.getMonth() + 1;
-      let year = date.getFullYear();
+    // Check if selected slot is available
+    if (!SlotTime) {
+      toast.error("Please select a time slot");
+      return;
+    }
+
+    // Check if selected day is active
+    if (!docSlots[SlotIndex]?.isDayActive) {
+      toast.error("Doctor is not available on this day");
+      return;
+    }
+
+    // Verify the selected slot is doctor available
+    const selectedSlot = docSlots[SlotIndex].daySlots?.find(
+      (s) => s.time === SlotTime,
+    );
+    if (!selectedSlot?.isDoctorAvailable) {
+      toast.error("This time slot is not available");
+      return;
+    }
+
+    try {
+      const dayDate = docSlots[SlotIndex].daySlots[0]?.datetime;
+
+      let day = dayDate.getDate();
+      let month = dayDate.getMonth() + 1;
+      let year = dayDate.getFullYear();
 
       const slotDate = day + "_" + month + "_" + year;
 
@@ -103,7 +232,7 @@ function Appointment() {
         { docId: docId, slotDate: slotDate, slotTime: SlotTime },
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
 
       if (data.success) {
@@ -120,11 +249,16 @@ function Appointment() {
   };
 
   useEffect(() => {
-    fetchInfo();
-  }, [doctors, docId]);
+    const loadDoctorInfo = async () => {
+      await fetchInfo();
+    };
+    loadDoctorInfo();
+  }, [docId, backendUrl]);
 
   useEffect(() => {
-    getAvailableSlots();
+    if (docInfo && docInfo._id) {
+      getAvailableSlots();
+    }
   }, [docInfo]);
 
   useEffect(() => {
@@ -180,52 +314,78 @@ function Appointment() {
         {/* booking slots */}
         <div className="sm:ml-72  sm:pl-4 mt-4 font-medium text-gray-700">
           <p>Booking Slots</p>
-          {/* <div>
-            {docSlots.length > 0 &&
-              docSlots.map((item, index) => {
-                <div key={index}>
-                  <p>{item[0] && dayOfweek[item[0].datetime.getDay()]}</p>
-                  <p>{item[0] && item[0].datetime.getDate()}</p>
-                </div>;
-              })}
-          </div> */}
-          <div className="flex  gap-3 items-center w-full  mt-4">
+
+          {/* Day Selection */}
+          <div className="flex gap-3 items-center w-full mt-4 overflow-x-scroll">
             {docSlots.length &&
               docSlots.map((item, index) => {
                 return (
                   <div
                     key={index}
-                    onClick={() => setSlotIndex(index)}
-                    className={`text-center py-6 min-w-16 rounded-full cursor-pointer ${
-                      SlotIndex === index
-                        ? "bg-primary text-white"
-                        : "border border-gray-200"
+                    onClick={() => {
+                      if (item.isDayActive) {
+                        setSlotIndex(index);
+                      }
+                    }}
+                    className={`text-center py-6 min-w-16 rounded-full flex-shrink-0 transition ${
+                      item.isDayActive
+                        ? SlotIndex === index
+                          ? "bg-primary text-white border border-primary cursor-pointer"
+                          : "border border-gray-200 cursor-pointer hover:border-primary"
+                        : "opacity-50 bg-gray-100 border border-gray-300 text-gray-400 cursor-not-allowed"
                     }`}
+                    title={
+                      !item.isDayActive
+                        ? `${item.dayName} - Doctor not available`
+                        : ""
+                    }
                   >
-                    <p>{item[0] && dayOfweek[item[0].datetime.getDay()]}</p>
-                    <p>{item[0] && item[0].datetime.getDate()}</p>
+                    <p className="text-sm font-semibold">{item.dayName}</p>
                   </div>
                 );
               })}
           </div>
-          <div className="flex items-center gap-3 w-full overflow-x-scroll mt-4">
-            {docSlots.length &&
-              docSlots[SlotIndex].map((item, index) => {
+
+          {/* Time Slots for Selected Day */}
+          {docSlots[SlotIndex]?.isDayActive ? (
+            <div className="flex items-center gap-3 w-full overflow-x-scroll mt-4">
+              {docSlots[SlotIndex].daySlots.map((item, index) => {
                 return (
                   <p
-                    onClick={() => setSlotTime(item.time)}
-                    className={`mt-5 text-sm font-light flex-shrink-0 px-5 py-2 rounded-full cursor-pointer ${
-                      item.time === SlotTime
-                        ? "bg-primary text-white"
-                        : "text-gray-700 border border-gray-400"
+                    onClick={() => {
+                      // Only allow selection if doctor has this slot available
+                      if (item.isDoctorAvailable) {
+                        setSlotTime(item.time);
+                      }
+                    }}
+                    className={`mt-5 text-sm font-light flex-shrink-0 px-5 py-2 rounded-full cursor-pointer transition ${
+                      item.isDoctorAvailable
+                        ? item.time === SlotTime
+                          ? "bg-primary text-white"
+                          : "text-gray-700 border border-gray-400 hover:border-primary"
+                        : "opacity-50 text-gray-400 border border-gray-300 cursor-not-allowed"
                     }`}
                     key={index}
+                    title={
+                      !item.isDoctorAvailable
+                        ? "This slot is not available"
+                        : ""
+                    }
                   >
                     {item.time.toLowerCase()}
                   </p>
                 );
               })}
-          </div>
+            </div>
+          ) : (
+            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded text-red-700">
+              <p>
+                Doctor is not available on{" "}
+                {docSlots[SlotIndex]?.dayName || "this day"}. Please select a
+                different day.
+              </p>
+            </div>
+          )}
           <button
             onClick={bookAppointment}
             className="bg-primary text-white text-sm font-light px-8 py-3 rounded-full my-6 mt-7 cursor-pointer"
