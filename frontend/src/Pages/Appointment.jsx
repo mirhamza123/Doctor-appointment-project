@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AppContext } from "../Context/AppContext";
 import { assets } from "../assets/assets";
@@ -19,6 +19,15 @@ function Appointment() {
   const [docSlots, setDocSlots] = useState([]);
   const [SlotIndex, setSlotIndex] = useState(0);
   const [SlotTime, setSlotTime] = useState("");
+  const slotContainerRef = useRef(null);
+
+  // Reset scroll position when day changes
+  useEffect(() => {
+    if (slotContainerRef.current) {
+      slotContainerRef.current.scrollLeft = 0;
+      setSlotTime(""); // Clear selected slot time when day changes
+    }
+  }, [SlotIndex]);
 
   const fetchInfo = async () => {
     try {
@@ -103,21 +112,14 @@ function Appointment() {
       currentDate.setHours(8);
       currentDate.setMinutes(0);
 
-      // For today, skip slots that have already passed
-      if (today.getDate() === currentDate.getDate()) {
-        const now = new Date();
-        while (currentDate < now) {
-          currentDate.setMinutes(currentDate.getMinutes() + 30);
-        }
-      }
-
       let timeSlots = [];
 
       while (currentDate < endTime) {
-        let formatedTime = currentDate.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
+        // Format time to match DoctorTimeSlotManager format: "08:00 am"
+        const minutes = String(currentDate.getMinutes()).padStart(2, "0");
+        const period = currentDate.getHours() >= 12 ? "pm" : "am";
+        const displayHours = currentDate.getHours() % 12 || 12; // Convert to 12-hour format
+        const formatedTime = `${String(displayHours).padStart(2, "0")}:${minutes} ${period}`;
 
         let day = currentDate.getDate();
         let month = currentDate.getMonth() + 1;
@@ -136,6 +138,7 @@ function Appointment() {
 
         if (hasConfiguredSchedule) {
           // Use new schedule system (doctor has configured days/slots)
+          // If doctor explicitly selected this slot, show it regardless of past time
           isDoctorAvailable =
             isDayActive && availableSlotsForDay.includes(slotTime);
         } else if (
@@ -143,7 +146,14 @@ function Appointment() {
           docInfo.availableSlots.length > 0
         ) {
           // Use legacy availableSlots system (old simple slots array)
-          isDoctorAvailable = docInfo.availableSlots.includes(slotTime);
+          // For legacy system, only skip past slots for today
+          if (today.getDate() === currentDate.getDate()) {
+            const now = new Date();
+            isDoctorAvailable =
+              docInfo.availableSlots.includes(slotTime) && currentDate >= now;
+          } else {
+            isDoctorAvailable = docInfo.availableSlots.includes(slotTime);
+          }
         } else {
           // No configuration - show all slots as available (default behavior)
           isDoctorAvailable = true;
@@ -348,7 +358,10 @@ function Appointment() {
 
           {/* Time Slots for Selected Day */}
           {docSlots[SlotIndex]?.isDayActive ? (
-            <div className="flex items-center gap-3 w-full overflow-x-scroll mt-4">
+            <div
+              className="flex items-center gap-3 w-full overflow-x-scroll mt-4"
+              ref={slotContainerRef}
+            >
               {docSlots[SlotIndex].daySlots.map((item, index) => {
                 return (
                   <p

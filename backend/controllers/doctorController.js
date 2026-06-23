@@ -197,6 +197,12 @@ const doctorProfile = async (req, res) => {
   try {
     const docId = req.docId;
     const profileData = await doctorModel.findById(docId).select("-password");
+
+    console.log(
+      "📤 Fetching doctor profile. Tuesday slots:",
+      profileData.availableSchedule?.find((s) => s.day === "TUE"),
+    );
+
     res.json({ success: true, profileData });
   } catch (error) {
     console.error(error);
@@ -359,6 +365,11 @@ const updateAvailableSchedule = async (req, res) => {
     const docId = req.docId;
     const { availableSchedule } = req.body;
 
+    console.log(
+      "📥 Received schedule update:",
+      JSON.stringify(availableSchedule, null, 2),
+    );
+
     // Validate that availableSchedule is an array
     if (!Array.isArray(availableSchedule)) {
       return res.json({
@@ -395,6 +406,11 @@ const updateAvailableSchedule = async (req, res) => {
       docId,
       { availableSchedule },
       { new: true },
+    );
+
+    console.log(
+      "✅ Schedule saved. Tuesday slots:",
+      updatedDoctor.availableSchedule.find((s) => s.day === "TUE"),
     );
 
     res.json({
