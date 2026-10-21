@@ -35,31 +35,31 @@ const AllApointment = () => {
 
       <div className="overflow-hidden rounded-[30px] bg-white shadow-[0_12px_40px_-20px_rgba(15,23,42,0.2)]">
         <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
-            <thead className="bg-slate-200 text-black">
+          <table className="min-w-full text-[10px]">
+            <thead className="bg-slate-200 text-slate-600">
               <tr>
-                <th className="whitespace-nowrap px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.15em] text-black">
+                <th className="whitespace-nowrap px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.15em] ">
                   #
                 </th>
-                <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.15em] text-black">
+                <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.15em] ">
                   Patient
                 </th>
-                <th className="whitespace-nowrap px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.15em] text-black">
+                <th className="whitespace-nowrap px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.15em] ">
                   Age
                 </th>
-                <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.15em] text-black">
+                <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.15em] ">
                   Date & Time
                 </th>
-                <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.15em] text-black">
+                <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.15em] ">
                   Doctor
                 </th>
-                <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.15em] text-black">
+                <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.15em] ">
                   Fees
                 </th>
-                <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.15em] text-black">
+                <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.15em] ">
                   Status
                 </th>
-                <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.15em] text-black">
+                <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.15em] ">
                   Action
                 </th>
               </tr>
