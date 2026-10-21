@@ -32,7 +32,7 @@ function App() {
         <aside className="h-full w-64 flex-shrink-0 overflow-hidden">
           <Sidebar />
         </aside>
-        <main className="h-full min-w-0 flex-1 overflow-y-auto">
+        <main className="flex-1 h-full min-w-0 overflow-y-auto p-6">
           <Routes>
             <Route
               path="/"
