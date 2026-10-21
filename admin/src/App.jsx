@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import Login from "./pages/Login";
 import AdminContextProvider from "./context/AdminContext";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AdminContext } from "./context/AdminContext";
 import Navbar from "./component/Navbar";
@@ -23,12 +23,16 @@ function App() {
   const { dtoken } = useContext(DoctorContext);
 
   return aToken || dtoken ? (
-    <div className="bg-[#F8F9FD]">
+    <div className="flex h-screen w-screen flex-col overflow-hidden bg-[#F8F9FD]">
       <ToastContainer />
-      <Navbar />
-      <div className="flex items-start w-full">
-        <Sidebar />
-        <main className="flex-1 min-w-0 w-full">
+      <header className="shrink-0">
+        <Navbar />
+      </header>
+      <div className="flex min-h-0 flex-1">
+        <aside className="h-full w-64 flex-shrink-0 overflow-hidden">
+          <Sidebar />
+        </aside>
+        <main className="h-full min-w-0 flex-1 overflow-y-auto">
           <Routes>
             <Route
               path="/"
