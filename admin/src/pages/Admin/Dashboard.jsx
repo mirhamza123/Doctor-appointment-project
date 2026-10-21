@@ -6,12 +6,8 @@ import { assets } from "../../assets/assets.js";
 import { AppContext } from "../../context/AppContext.jsx";
 
 const Dashboard = () => {
-  const {
-    aToken,
-    getDashData,
-    deleteAppointment,
-    dashData,
-  } = useContext(AdminContext);
+  const { aToken, getDashData, deleteAppointment, dashData } =
+    useContext(AdminContext);
 
   const { slotDateFormate, calculateAge, currency } = useContext(AppContext);
 
@@ -106,12 +102,10 @@ const Dashboard = () => {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="min-w-full text-sm">
+            <table className="min-w-full text-[10px]">
               <thead className="bg-slate-200 text-slate-600">
                 <tr>
-                  <th className="px-6 py-4 text-left font-semibold uppercase tracking-[0.12rem]">
-                    #
-                  </th>
+                  <th className="px-6 py-4 text-left font-semibold ">#</th>
                   <th className="px-6 py-4 text-left font-semibold uppercase tracking-[0.12rem]">
                     Patient
                   </th>
