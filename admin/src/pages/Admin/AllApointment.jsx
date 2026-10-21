@@ -6,12 +6,8 @@ import { AppContext } from "../../context/AppContext";
 import { assets } from "../../assets/assets";
 
 const AllApointment = () => {
-  const {
-    aToken,
-    appointments,
-    getAllAppointments,
-    deleteAppointment,
-  } = useContext(AdminContext);
+  const { aToken, appointments, getAllAppointments, deleteAppointment } =
+    useContext(AdminContext);
   const { calculateAge, slotDateFormate, currency } = useContext(AppContext);
 
   useEffect(() => {
@@ -21,7 +17,7 @@ const AllApointment = () => {
   }, [aToken]);
 
   return (
-    <div className="w-full m-5">
+    <div className="">
       <div className="mb-6 flex flex-col gap-4 rounded-3xl border border-slate-200 bg-slate-50 p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-2xl font-semibold text-slate-900">
