@@ -38,7 +38,7 @@ const AddDoctor = () => {
       formData.append("degree", degree);
       formData.append(
         "address",
-        JSON.stringify({ line1: address1, line2: address2 })
+        JSON.stringify({ line1: address1, line2: address2 }),
       );
 
       // console.log(...formData);
@@ -49,7 +49,7 @@ const AddDoctor = () => {
       const { data } = await axios.post(
         `${backendUrl}/api/admin/add-doctor`,
         formData,
-        { headers: { aToken } }
+        { headers: { aToken } },
       );
       if (data.success) {
         toast.success(data.message);
@@ -72,7 +72,7 @@ const AddDoctor = () => {
   };
 
   return (
-    <form onSubmit={onSubmitHandler} className="m-5 w-full">
+    <form onSubmit={onSubmitHandler} className="m-5">
       <p className="mb-3 text-lg font-medium">Add Doctor</p>
       <div className="bg-white px-8 py-8  rounded w-full max-w-4xl max-h-[80vh] overflow-y-scroll">
         <div className="flex items-center gap-4 mb-8 text-gray-500">
